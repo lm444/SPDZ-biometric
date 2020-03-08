@@ -16,8 +16,8 @@
 #include <stdlib.h>
 
 typedef struct irisStruct {
-	char* irisCode;
-	char* mask;
+	int* irisCode;
+	int* mask;
 	int size;
 } iris;
 

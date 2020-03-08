@@ -6,16 +6,11 @@
  */
 #include "Common.h"
 
-#define IRIS1 "/home/lorenzo/Desktop/Tesi/iris6400.txt"
-#define OUT "sample.txt"
-#define IRIS2 ""
+#define IRIS1 "iris6400.txt"
 
 #define BUF_SIZE 65536
 //#define HEADER_SIZE 128
 
-
-
-void readAux() {}
 
 void shrinkIrisFile() {
 	int fd, ret;
@@ -46,6 +41,7 @@ void shrinkIrisFile() {
 	res[validBytes]='\0';
 
 	int writtenBytes=0;
+
 /*	sprintf(header, "%d", validBytes);
 
 	while (writtenBytes<HEADER_SIZE) {
@@ -56,7 +52,7 @@ void shrinkIrisFile() {
 */
 
 	int outfd;
-	outfd = open(OUT, O_WRONLY|O_CREAT, 0640);
+	outfd = open("sample.txt", O_WRONLY|O_CREAT, 0640);
 	if (outfd<0) handle_error("Error while opening output file");
 
 
@@ -119,6 +115,8 @@ iris* readIris (const char* inputFile) {
 
 	return res;
 }
+
+void placeholder (iris* test) {}
 
 int main(int argc, char** argv) {
 	//printf("SPDZ");
