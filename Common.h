@@ -1,10 +1,3 @@
-/*
- * Common.h
- *
- *  Created on: Mar 8, 2020
- *      Author: lorenzo
- */
-
 #ifndef COMMON_H_
 #define COMMON_H_
 
@@ -17,6 +10,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <errno.h>
 
 
 #define IRIS_CLIENT "sample.txt"
@@ -25,14 +19,15 @@
 #define SERVER_ADDR "127.0.0.1"
 #define SERVER_PORT 5555
 
-typedef struct irisStruct {
-	int* irisCode;
-	int* mask;
-	int size;
-} iris;
+#define OUTPUT_BIN  "./bin"
+
+#define VERBOSE 	0
+
+// Later will implement the converter in a different executable
+#define CONVERTER 	1
 
 void handle_error(const char* msg);
 void shrinkIrisFile();
 
 
-#endif /* COMMON_H_ */
+#endif

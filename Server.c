@@ -1,16 +1,12 @@
-/*
- * Server.cpp
- *
- *  Created on: Mar 8, 2020
- *      Author: lorenzo
- */
-
 #include "Common.h"
+#include "Iris.h"
 
 int main(int argc, char** argv) {
 	int ret, socket_desc, client_desc;
 	struct sockaddr_in server_addr = {0}, client_addr = {0};
 	int sockaddr_len = sizeof(struct sockaddr_in);
+
+	Iris* test= (Iris*) malloc(sizeof(Iris));
 
 	socket_desc = socket(AF_INET, SOCK_STREAM, 0);
 	if (socket_desc<0) handle_error("Socket create");

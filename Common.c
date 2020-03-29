@@ -1,10 +1,3 @@
-/*
- * Common.cpp
- *
- *  Created on: Mar 8, 2020
- *      Author: lorenzo
- */
-
 #include "Common.h"
 
 #define IRIS1 "iris6400.txt"
