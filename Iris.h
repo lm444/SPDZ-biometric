@@ -9,5 +9,7 @@ typedef struct IrisStruct {
 
 Iris* readIris (const char* inputFile);
 void printIris(Iris* iris);
+void sendIris(Iris* iris, int to);
+Iris* recvIris(int from);
 
 #endif

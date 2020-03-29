@@ -17,11 +17,10 @@
 #define IRIS_SERVER "sample.txt"
 
 #define SERVER_ADDR "127.0.0.1"
-#define SERVER_PORT 5555
-
-#define OUTPUT_BIN  "./bin"
+#define SERVER_PORT 5556
 
 #define VERBOSE 	0
+#define DEBUG 		1
 
 // Later will implement the converter in a different executable
 #define CONVERTER 	1

@@ -24,5 +24,26 @@ int main(int argc, char** argv) {
 	client_desc = accept(socket_desc, (struct sockaddr*) &client_addr, (socklen_t*) &sockaddr_len);
 	if (client_desc<0) handle_error("Accept");
 	printf("Connection successful.\n");
+
+	if (DEBUG) {
+		Iris* iris = recvIris(client_desc);
+		printIris(iris);
+		printf("Received iris of size: %d.\n", iris->size);
+		Iris* iris2 = readIris(IRIS_SERVER);
+		if (iris->size!=iris2->size) {
+			printf("Mismatching sizes. Terminating... "); exit(1);
+		}
+		int i;
+		for (i=0; i<iris->size/2; i++) {
+			if (iris->mask[i]!=iris2->mask[i]) {
+				printf("Mismatching mask. Terminating... "); exit(1);
+			}
+			if (iris->iriscode[i]!=iris2->iriscode[i]) {
+				printf("Mismatching mask. Terminating... "); exit(1);
+			}
+		}
+		printf("Communication was successful.\n");
+	}
+
 	return 0;
 }

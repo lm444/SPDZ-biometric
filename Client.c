@@ -18,9 +18,12 @@ int main(int argc, char** argv) {
 	printf("Connection successful.\n");
 
 	if (CONVERTER) shrinkIrisFile();
-	Iris* iris = readIris(IRIS_CLIENT);
-
-	printIris(iris);
-	int i;
+	if (DEBUG) {
+	 	Iris* iris = readIris(IRIS_CLIENT);
+		printIris(iris);
+		sendIris(iris, server_desc);
+		printf("Sent iris of size: %d.\n", iris->size);
+	}
+	
 	return 0;
 }
