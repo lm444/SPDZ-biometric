@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
 	if (client_desc<0) handle_error("Accept");
 	printf("Connection successful.\n");
 
+	// 30.03.2020: just a generic test for the communication primitives.
 	if (DEBUG) {
 		Iris* iris = recvIris(client_desc);
 		printIris(iris);

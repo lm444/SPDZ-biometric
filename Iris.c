@@ -68,6 +68,8 @@ void printIris(Iris* iris) {
    - then, both the iriscode and the mask are sent.
    Receives will happen in the same order. */
 
+// TODO: Check for connection failures
+
 void sendIris(Iris* iris, int to) {
     send(to, &iris->size, sizeof(int), 0);
 
