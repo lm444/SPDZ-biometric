@@ -1,6 +1,6 @@
-srcClient = Client.c Common.c Iris.c
-srcServer = Server.c Common.c Iris.c
-srcDealer = TrustedDealer.c Common.c
+srcClient = Client.c Common.c Iris.c Communication.c
+srcServer = Server.c Common.c Iris.c Communication.c
+srcDealer = TrustedDealer.c Common.c Communication.c
 
 binPath = ./bin/
 binClient = client

@@ -62,6 +62,13 @@ void printIris(Iris* iris) {
 	printf("\n");
 }
 
+void destroyIris(Iris* iris) {
+	if (VERBOSE) printf("Freeing iris %p\n", iris);
+	free(iris->iriscode);
+	free(iris->mask);
+	free(iris);
+}
+
 /* At this stage the iris has already been parsed correctly.
    Communication protocol in two phases:
    - first, the size of the iris is sent;

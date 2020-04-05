@@ -23,11 +23,15 @@
 #define DEALER_ADDR "127.0.0.1"
 #define DEALER_PORT 5556
 
+/* Different levels of VERBOSE:
+   1 - Just some minor additional print
+   2 - Includes lenghty prints (care!)
+*/
 #define VERBOSE 	0
-#define DEBUG 		1
+#define DEBUG 		0
 
 // Later will implement the converter in a different executable
-#define CONVERTER 	1
+#define CONVERTER 	0
 
 typedef struct MultTripleStruct {
     int a;
@@ -36,9 +40,7 @@ typedef struct MultTripleStruct {
 } MultTriple;
 #define MAX_TRIPLES 128000 
 
-
 void handle_error(const char* msg);
 void shrinkIrisFile();
-
 
 #endif

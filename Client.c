@@ -1,21 +1,23 @@
 #include "Common.h"
 #include "Iris.h"
+#include "Communication.h"
+
+int MACkeyShare;
+const MultTriple* MultTriples;
+
+int server_desc, dealer_desc;
 
 int main(int argc, char** argv) {
-	int ret, server_desc;
-	struct sockaddr_in server_addr = {0};
+	int ret;
 
-	server_desc = socket(AF_INET, SOCK_STREAM, 0);
-	if (server_desc<0) handle_error("Socket create");
+	server_desc=connectionTo(SERVER_ADDR, SERVER_PORT);
+	printf("[CLIENT] Connection to Server was successful.\n");
 
-	server_addr.sin_addr.s_addr = inet_addr(SERVER_ADDR);
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(SERVER_PORT);
+	dealer_desc=connectionTo(DEALER_ADDR, DEALER_PORT);
+	printf("[CLIENT] Connection to Dealer was successful.\n");
 
-	ret = connect(server_desc, (struct sockaddr*) &server_addr, sizeof(struct sockaddr_in));
-	if (ret<0) handle_error("Connect");
-
-	printf("Connection successful.\n");
+	MACkeyShare=recvMACkeyShare(dealer_desc);
+	printf("[CLIENT] Received MACkeyShare: %d\n", MACkeyShare);
 
 	if (CONVERTER) shrinkIrisFile();
 	if (DEBUG) {
@@ -23,6 +25,7 @@ int main(int argc, char** argv) {
 		printIris(iris);
 		sendIris(iris, server_desc);
 		printf("Sent iris of size: %d.\n", iris->size);
+		destroyIris(iris);
 	}
 	
 	return 0;
