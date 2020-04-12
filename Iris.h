@@ -1,6 +1,7 @@
 #ifndef IRIS_H_
 #define IRIS_H_
 
+// Iris size is here defined as length of the iriscode (which is the same as the mask).
 typedef struct IrisStruct {
 	int* iriscode;
 	int* mask;

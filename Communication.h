@@ -12,6 +12,10 @@
 int connectionTo(const char* IPaddr, int port);
 int bindPort(int port);
 int connectionFrom(int port);
+
+int sendTo(int to, void* data, int size, int flags);
+int recvFrom(int from, void* buf, int size, int flags);
+
 void sendMACkeyShare(int MACkeyShare, int to);
 int recvMACkeyShare(int from);
 void sendTripleShares(MultTriple* triples, int numTriples, int to);

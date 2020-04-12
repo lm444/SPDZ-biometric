@@ -22,10 +22,10 @@
    2 - Includes lenghty prints (care!)
 */
 #define VERBOSE 	2
-#define DEBUG 		0
+#define DEBUG 		1
 
 // Later will implement the converter in a different executable
-#define CONVERTER 	0
+#define CONVERTER 0
 
 void handle_error(const char* msg);
 void shrinkIrisFile();
