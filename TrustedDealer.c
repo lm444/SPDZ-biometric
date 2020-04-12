@@ -1,5 +1,6 @@
 #include "Common.h"
 #include "Communication.h"
+#include "SPDZ.h"
 
 /* Every share will be structured in an array of two fields
    arr[0] will be related to the Server
@@ -49,9 +50,9 @@ void generateTriples() {
     if (DEBUG|VERBOSE) {
         for (i=0; i<MAX_TRIPLES; i++) {
             if (VERBOSE==2) {
-                printf("MultTripleShares[%d][%d] = %d, %d, %d", 0, i, serverShares[i].a, serverShares[i].b, serverShares[i].c);
+                printf("MultTripleShares[SERVER][%d] = %d, %d, %d", i, serverShares[i].a, serverShares[i].b, serverShares[i].c);
                 printf("\n");
-                printf("MultTripleShares[%d][%d] = %d, %d, %d", 1, i, clientShares[i].a, clientShares[i].b, clientShares[i].c);
+                printf("MultTripleShares[CLIENT][%d] = %d, %d, %d", i, clientShares[i].a, clientShares[i].b, clientShares[i].c);
             }
             if (DEBUG) assert((serverShares[i].a+clientShares[i].a)*(serverShares[i].b+clientShares[i].b)==serverShares[i].c+clientShares[i].c);
             if (VERBOSE==2) printf("\n");
@@ -84,10 +85,16 @@ int main() {
     sendMACkeyShare(MACkeyShares[SERVER], server_desc);
     sendMACkeyShare(MACkeyShares[CLIENT], client_desc);
     printf("[TRUSTED DEALER] Sent MAC key shares: Server -> %d, Client -> %d.\n", MACkeyShares[SERVER], MACkeyShares[CLIENT]);
-  
+ 
     printf("[TRUSTED DEALER] Will now generate %d multiplicative triples...\n", MAX_TRIPLES);
     generateTriples();
     printf("[TRUSTED DEALER] Multiplicative triples generated.\n");
 
+    sendTripleShares(MultTripleShares[SERVER], MAX_TRIPLES, server_desc);
+    sendTripleShares(MultTripleShares[CLIENT], MAX_TRIPLES, client_desc);
+
     destroyTriples(MultTripleShares);
+    close(socket_desc);
+    close(server_desc);
+    close(client_desc);
 }

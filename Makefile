@@ -7,16 +7,18 @@ binClient = client
 binServer = server
 binDealer = dealer
 
+flags = -g
+
 all: client server dealer
 
 client: $(srcClient)
-	gcc -o $(binPath)$(binClient) $(srcClient)
+	gcc $(flags) -o $(binPath)$(binClient) $(srcClient) 
 
 server: $(srcServer)
-	gcc -o $(binPath)$(binServer) $(srcServer)
+	gcc $(flags) -o $(binPath)$(binServer) $(srcServer) 
 
 dealer: $(srcDealer)
-	gcc -o $(binPath)$(binDealer) $(srcDealer)
+	gcc $(flags) -o $(binPath)$(binDealer) $(srcDealer)
 
 .PHONY: clean
 clean: 

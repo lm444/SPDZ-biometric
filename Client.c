@@ -1,9 +1,10 @@
 #include "Common.h"
 #include "Iris.h"
 #include "Communication.h"
+#include "SPDZ.h"
 
 int MACkeyShare;
-const MultTriple* MultTriples;
+MultTriple* MultTripleShares;
 
 int server_desc, dealer_desc;
 
@@ -19,6 +20,16 @@ int main(int argc, char** argv) {
 	MACkeyShare=recvMACkeyShare(dealer_desc);
 	printf("[CLIENT] Received MACkeyShare: %d\n", MACkeyShare);
 
+	MultTripleShares=recvTripleShares(dealer_desc);
+	printf("[CLIENT] Received %d multiplicative triple shares.\n", MAX_TRIPLES);
+	
+	if (VERBOSE==2) {
+		int i;
+		for (i=0; i<MAX_TRIPLES; i++) {
+			printf("MultTripleShares[%d] = %d %d %d\n", i, MultTripleShares[i].a, MultTripleShares[i].b, MultTripleShares[i].c);
+		}
+	}
+	
 	if (CONVERTER) shrinkIrisFile();
 	if (DEBUG) {
 	 	Iris* iris = readIris(IRIS_CLIENT);
@@ -28,5 +39,7 @@ int main(int argc, char** argv) {
 		destroyIris(iris);
 	}
 	
+	close(server_desc);
+	close(dealer_desc);
 	return 0;
 }

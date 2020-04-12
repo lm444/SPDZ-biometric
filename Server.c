@@ -1,8 +1,10 @@
 #include "Common.h"
 #include "Iris.h"
 #include "Communication.h"
+#include "SPDZ.h"
 
 int MACkeyShare;
+MultTriple* MultTripleShares;
 
 int main(int argc, char** argv) {
 	int ret, client_desc, socket_desc, dealer_desc;
@@ -16,6 +18,16 @@ int main(int argc, char** argv) {
 	MACkeyShare=recvMACkeyShare(dealer_desc);
 	printf("[SERVER] Received MACkeyShare: %d\n", MACkeyShare);
 
+	MultTripleShares=recvTripleShares(dealer_desc);
+	printf("[SERVER] Received %d multiplicative triple shares.\n", MAX_TRIPLES);
+
+	if (VERBOSE==2) {
+		int i;
+		for (i=0; i<MAX_TRIPLES; i++) {
+			printf("MultTripleShares[%d] = %d %d %d\n", i, MultTripleShares[i].a, MultTripleShares[i].b, MultTripleShares[i].c);
+		}
+	}
+	
 	// 30.03.2020: just a generic test for the communication primitives.
 	if (DEBUG) {
 		Iris* iris = recvIris(client_desc);
@@ -40,5 +52,8 @@ int main(int argc, char** argv) {
 		
 	}
 
+	close(socket_desc);
+	close(client_desc);
+	close(dealer_desc);
 	return 0;
 }
