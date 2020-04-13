@@ -56,6 +56,9 @@ int main(int argc, char** argv) {
 		}
 		printf("Communication was successful.\n");
 
+		Iris** shares = genIrisShares(iris);
+		printShares(shares);
+
 		// Checking Hamming Distance between Irises (here: same iris)
 		printf("Now will try authentication check between two same irises...\n");
 		AuthCheckClear(iris, iris2);
@@ -66,6 +69,7 @@ int main(int argc, char** argv) {
 		printf("Authentication check after arbitrarily modifying one of the two irises...\n");
 		AuthCheckClear(iris, iris2);
 
+		destroyShares(shares);
 		destroyIris(iris);
 		destroyIris(iris2);
 		

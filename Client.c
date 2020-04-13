@@ -31,14 +31,16 @@ int main(int argc, char** argv) {
 	}
 	
 	if (CONVERTER) shrinkIrisFile();
-	if (DEBUG) {
-	 	Iris* iris = readIris(IRIS_CLIENT);
-		printIris(iris);
-		sendIris(iris, server_desc);
-		printf("Sent iris of size: %d.\n", iris->size);
-		destroyIris(iris);
-	}
+	Iris* iris = readIris(IRIS_CLIENT);
+	if (VERBOSE) printIris(iris);
+
 	
+
+	sendIris(iris, server_desc);
+	printf("Sent iris of size: %d.\n", iris->size);
+	
+
+	destroyIris(iris);
 	close(server_desc);
 	close(dealer_desc);
 	return 0;

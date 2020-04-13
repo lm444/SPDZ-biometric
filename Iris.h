@@ -10,8 +10,23 @@ typedef struct IrisStruct {
 
 Iris* readIris(const char* inputFile);
 void printIris(Iris* iris);
+void destroyIris(Iris* iris);
+
 void sendIris(Iris* iris, int to);
 Iris* recvIris(int from);
-void destroyIris(Iris* iris);
+
+/*
+typedef struct IrisSharesStruct {
+	Iris* share0;
+	Iris* share1;
+} IrisShares;
+*/
+
+/* An additional structure might help in readability;
+   the following methods would refer to it. */
+
+Iris** genIrisShares(Iris* iris);
+void printShares(Iris** shares);
+void destroyShares(Iris** shares);
 
 #endif

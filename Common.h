@@ -25,7 +25,7 @@
 #define DEBUG 		1
 
 // Later will implement the converter in a different executable
-#define CONVERTER 0
+#define CONVERTER 1
 
 void handle_error(const char* msg);
 void shrinkIrisFile();
