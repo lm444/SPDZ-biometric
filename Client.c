@@ -8,6 +8,15 @@ MultTriple* MultTripleShares;
 
 int server_desc, dealer_desc;
 
+void testClientFunctionalities() {
+	if (CONVERTER) shrinkIrisFile();
+	Iris* iris = readIris(IRIS_CLIENT);
+	if (VERBOSE) printIris(iris);
+
+	sendIris(iris, server_desc);
+	destroyIris(iris);
+}
+
 int main(int argc, char** argv) {
 	int ret;
 
@@ -29,18 +38,27 @@ int main(int argc, char** argv) {
 			printf("MultTripleShares[%d] = %d %d %d\n", i, MultTripleShares[i].a, MultTripleShares[i].b, MultTripleShares[i].c);
 		}
 	}
-	
-	if (CONVERTER) shrinkIrisFile();
-	Iris* iris = readIris(IRIS_CLIENT);
-	if (VERBOSE) printIris(iris);
 
+	if (DEBUG) testClientFunctionalities();
 	
+	/* clientIris will be the shares of the Client's iris 
+	   serverIris will be the shares of the Server's iris 
+	   We will operate on those two for SPDZ; originalIris won't be used */
 
-	sendIris(iris, server_desc);
-	printf("Sent iris of size: %d.\n", iris->size);
-	
+	Iris* originalIris = readIris(IRIS_CLIENT);
+	Iris** shares = genIrisShares(originalIris);
 
-	destroyIris(iris);
+	Iris* clientIris = shares[0];
+	sendIris(shares[1], server_desc);
+
+	Iris* serverIris = recvIris(server_desc);
+
+
+	destroyIris(originalIris);
+	destroyShares(shares); 		// will also destroy clientIris!
+	destroyIris(serverIris);
+	free(MultTripleShares);
+
 	close(server_desc);
 	close(dealer_desc);
 	return 0;

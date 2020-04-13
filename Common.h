@@ -21,8 +21,8 @@
    1 - Just some minor additional print
    2 - Includes lenghty prints (care!)
 */
-#define VERBOSE 	2
-#define DEBUG 		1
+#define VERBOSE 	1
+#define DEBUG 		0
 
 // Later will implement the converter in a different executable
 #define CONVERTER 1

@@ -132,6 +132,8 @@ void sendIris(Iris* iris, int to) {
 
     sendTo(to, iris->iriscode, iris->size*sizeof(int), 0);
     sendTo(to, iris->mask,     iris->size*sizeof(int), 0);
+	
+	if (VERBOSE) printf("Sent iris of size: %d.\n", iris->size);
 }
 
 Iris* recvIris(int from) {
@@ -142,5 +144,7 @@ Iris* recvIris(int from) {
 
     recvFrom(from, res->iriscode, res->size*sizeof(int), 0);
     recvFrom(from, res->mask,     res->size*sizeof(int), 0);
+
+	if (VERBOSE) printf("Received iris of size: %d.\n", res->size);
     return res;
 }
