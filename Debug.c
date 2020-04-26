@@ -5,8 +5,6 @@
 #include "Common.h"
 #include "Iris.h"
 
-#define THRESHOLD 0.25
-
 void AuthCheckClear(Iris* iris1, Iris* iris2) {
     if (iris1->size!=iris2->size) {
         printf("Mismatching iris sizes. Skipping check.\n");

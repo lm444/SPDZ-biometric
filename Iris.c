@@ -2,8 +2,6 @@
 #include "Common.h"
 #include "Communication.h"
 
-#define IRIS_PRIME 7  // Max random value for the iris feature share generation
-
 Iris* createIris(int size) {
 	Iris* res = (Iris*) malloc(sizeof(Iris));
 
@@ -73,7 +71,7 @@ void destroyIris(Iris* iris) {
 }
 
 // Will return an array of two Irises containing the respective shares
-// Shares will be generated inside the interval (-IRIS_PRIME-1, IRIS_PRIME)
+// Shares will be generated inside the interval (-P_FIELD-1, P_FIELD)
 
 Iris** genIrisShares(Iris* iris) {
 	int i;
@@ -82,10 +80,10 @@ Iris** genIrisShares(Iris* iris) {
 	res[1] = createIris(iris->size);
 
 	for (i=0; i<iris->size; i++) {
-		res[0]->iriscode[i]=(iris->iriscode[i]-rand()+RAND_MAX/2)%IRIS_PRIME;
+		res[0]->iriscode[i]=(iris->iriscode[i]-rand()+RAND_MAX/2)%P_FIELD;
 		res[1]->iriscode[i]=iris->iriscode[i]-res[0]->iriscode[i];
 
-		res[0]->mask[i]=(iris->mask[i]-rand()+RAND_MAX/2)%IRIS_PRIME;
+		res[0]->mask[i]=(iris->mask[i]-rand()+RAND_MAX/2)%P_FIELD;
 		res[1]->mask[i]=iris->mask[i]-res[0]->mask[i];
 	}
 
@@ -96,8 +94,8 @@ Iris** genIrisShares(Iris* iris) {
 				printf("mask[%d]=%d; Share0[%d]=%d; Share1[%d]=%d\n", i, iris->mask[i], i, res[0]->mask[i], i, res[1]->mask[i]);
 			}
 			if (DEBUG) {
-				assert((res[0]->iriscode[i]+res[1]->iriscode[i])%IRIS_PRIME == iris->iriscode[i]);
-				assert((res[0]->mask[i]+res[1]->mask[i])%IRIS_PRIME == iris->mask[i]);
+				assert((res[0]->iriscode[i]+res[1]->iriscode[i])%P_FIELD == iris->iriscode[i]);
+				assert((res[0]->mask[i]+res[1]->mask[i])%P_FIELD == iris->mask[i]);
 			}
 		}
 	}

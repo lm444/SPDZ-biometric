@@ -1,5 +1,5 @@
-srcClient = Client.c Common.c Iris.c Communication.c
-srcServer = Server.c Common.c Iris.c Communication.c Debug.c
+srcClient = Client.c Common.c Iris.c Communication.c SPDZ.c
+srcServer = Server.c Common.c Iris.c Communication.c SPDZ.c Debug.c
 srcDealer = TrustedDealer.c Common.c Communication.c
 
 binPath = ./bin/
@@ -7,7 +7,7 @@ binClient = client
 binServer = server
 binDealer = dealer
 
-flags = -g
+flags = -g -Wall
 
 all: client server dealer
 

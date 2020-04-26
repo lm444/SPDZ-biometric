@@ -17,11 +17,17 @@
 #define IRIS_CLIENT "sample.txt"
 #define IRIS_SERVER "sample.txt"
 
+#define SERVER 0
+#define CLIENT 1
+
+#define THRESHOLD 0.25
+#define P_FIELD 2
+
 /* Different levels of VERBOSE:
    1 - Just some minor additional print
    2 - Includes lenghty prints (care!)
 */
-#define VERBOSE 	1
+#define VERBOSE 	2
 #define DEBUG 		0
 
 // Later will implement the converter in a different executable

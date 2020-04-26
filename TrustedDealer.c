@@ -4,11 +4,7 @@
 
 /* Every share will be structured in an array of two fields
    arr[0] will be related to the Server
-   arr[1] will be related to the Client 
-   The following defines are for readability */
-
-#define SERVER 0
-#define CLIENT 1
+   arr[1] will be related to the Client */
 
 #define DEBUG_RAND_MAX 100000
 

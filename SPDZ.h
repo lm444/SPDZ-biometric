@@ -1,6 +1,8 @@
 #ifndef SPDZ_H_
 #define SPDZ_H_
 
+#include "Iris.h"
+
 #define MAX_TRIPLES 10 
 
 typedef struct MultTripleStruct {
@@ -8,5 +10,7 @@ typedef struct MultTripleStruct {
     int b;
     int c;
 } MultTriple;
+
+void spdz_hamming_dist(Iris* iris1, Iris* iris2, MultTriple* triples, int self, int other);
 
 #endif

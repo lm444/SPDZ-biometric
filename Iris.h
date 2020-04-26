@@ -17,8 +17,8 @@ Iris* recvIris(int from);
 
 /*
 typedef struct IrisSharesStruct {
-	Iris* share0;
-	Iris* share1;
+	Iris* shareSelf;
+	Iris* shareOther;
 } IrisShares;
 */
 

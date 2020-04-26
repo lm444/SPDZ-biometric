@@ -18,8 +18,6 @@ void testClientFunctionalities() {
 }
 
 int main(int argc, char** argv) {
-	int ret;
-
 	server_desc=connectionTo(SERVER_ADDR, SERVER_PORT);
 	printf("[CLIENT] Connection to Server was successful.\n");
 
@@ -53,6 +51,7 @@ int main(int argc, char** argv) {
 
 	Iris* serverIris = recvIris(server_desc);
 
+	// spdz_hamming_dist(serverIris, clientIris, MultTripleShares, CLIENT, server_desc);
 
 	destroyIris(originalIris);
 	destroyShares(shares); 		// will also destroy clientIris!

@@ -52,8 +52,6 @@ void testServerFunctionalities() {
 }
 
 int main(int argc, char** argv) {
-	int ret;
-
 	socket_desc = bindPort(SERVER_PORT);
 	dealer_desc	= connectionTo(DEALER_ADDR, DEALER_PORT);
 	printf("[SERVER] Connection to Dealer was successful.\n");
@@ -86,6 +84,8 @@ int main(int argc, char** argv) {
 
 	Iris* clientIris = recvIris(client_desc);
 
+	// spdz_hamming_dist(serverIris, clientIris, MultTripleShares, SERVER, client_desc);
+
 	destroyIris(originalIris);
 	destroyShares(shares); 		// will also destroy serverIris!
 	destroyIris(clientIris);
@@ -94,5 +94,6 @@ int main(int argc, char** argv) {
 	close(socket_desc);
 	close(client_desc);
 	close(dealer_desc);
+	
 	return 0;
 }

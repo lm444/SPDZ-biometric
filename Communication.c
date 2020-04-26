@@ -26,7 +26,7 @@ int bindPort(int port) {
 }
 
 int connectionFrom(int socket_desc) {
-    int ret, client_desc;
+    int client_desc;
 
     int sockaddr_len = sizeof(struct sockaddr_in);
     struct sockaddr_in client_addr = {0};
@@ -82,6 +82,9 @@ int recvFrom(int from, void* buf, int size, int flags) {
 
 // Application-specific methods
 
+// Detached from the generic sendIntShare to simplify modification
+// for a different representation of the MAC key (e.g. uint64)
+
 void sendMACkeyShare(int MACkeyShare, int to) {
     sendTo(to, &MACkeyShare, sizeof(int), 0);
 }
@@ -93,7 +96,6 @@ int recvMACkeyShare(int from) {
 }
 
 void sendTripleShares(MultTriple* triples, int numTriples, int to) {
-    int ret;
     sendTo(to, &numTriples, sizeof(int), 0);
     sendTo(to, triples, numTriples*sizeof(MultTriple), 0);
 }
@@ -104,5 +106,15 @@ MultTriple* recvTripleShares(int from) {
 
     MultTriple* res = malloc(numTriples*sizeof(MultTriple));
     recvFrom(from, res, numTriples*sizeof(MultTriple), 0);
+    return res;
+}
+
+void sendIntShare(int share, int to) {
+    sendTo(to, &share, sizeof(int), 0);
+}
+
+int recvIntShare(int from) {
+    int res;
+    recvFrom(from, &res, sizeof(int), 0);
     return res;
 }
