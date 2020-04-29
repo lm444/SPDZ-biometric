@@ -69,13 +69,15 @@ int main(int argc, char** argv) {
 	// or up to PRINT_ELEMS triples (VERBOSE==1) 
 	if (VERBOSE) {
 		int i, max=PRINT_ELEMS;
+		int reverse=MAX_TRIPLES-1;
 		if (VERBOSE==2) max = MAX_TRIPLES;
-		for (i=0; i<max; i++) {
+		for (i=0; i<max; i++, reverse--) {
 			printf("MultTripleShares[%d] = %d %d %d\n", i, MultTripleShares[i].a, MultTripleShares[i].b, MultTripleShares[i].c);
+			printf("MultTripleShares[%d] = %d %d %d\n", reverse, MultTripleShares[reverse].a, MultTripleShares[reverse].b, MultTripleShares[reverse].c);
 		}
 	}
 	
-	if (DEBUG) testServerFunctionalities();
+	// if (DEBUG) testServerFunctionalities();
 
 	// Same as Client
 

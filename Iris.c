@@ -35,6 +35,7 @@ Iris* readIris(const char* inputFile) {
 	while (readBytes<(res->size)) {
 		char c;
 		ret = read(fd, &c, 1);
+		if (ret<0) handle_error("[IRIS] Error reading");
 		res->iriscode[readBytes] = c - '0';
 		readBytes++;
 	}
@@ -45,6 +46,7 @@ Iris* readIris(const char* inputFile) {
 	while (readBytes<(res->size)) {
 		char c;
 		ret = read(fd, &c, 1);
+		if (ret<0) handle_error("[IRIS] Error reading");
 		res->mask[readBytes] = c - '0';
 		readBytes++;
 	}

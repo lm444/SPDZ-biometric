@@ -3,7 +3,7 @@
 
 #include "Iris.h"
 
-#define MAX_TRIPLES 128
+#define MAX_TRIPLES 5000000
 
 typedef struct MultTripleStruct {
     int a;

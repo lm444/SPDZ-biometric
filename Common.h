@@ -30,7 +30,7 @@
    2 - Includes lenghty prints (care!)
 */
 #define VERBOSE 	1
-#define DEBUG 		0
+#define DEBUG 		1
 
 #define PRINT_ELEMS 100
 

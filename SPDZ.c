@@ -64,6 +64,7 @@ void spdz_hamming_dist(Iris* iris1, Iris* iris2, MultTriple* triples, int self, 
 
         num += spdz_mult(num1, num2, tracker, self, other);
         den -= (m1+m2-m1m2);
+        tracker++;
         T++;
     }
 

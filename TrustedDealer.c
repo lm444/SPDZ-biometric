@@ -65,11 +65,9 @@ int main() {
     // TD will have a connection with both the Server and the Client.
     // IMPORTANT: it is mandatory to run Dealer -> Server -> Client
 
-    int socket_desc = bindPort(DEALER_PORT);
-    int server_desc = connectionFrom(socket_desc);
-    printf("[TRUSTED DEALER] Inbound connection from Server\n");
-    int client_desc = connectionFrom(socket_desc);
-    printf("[TRUSTED DEALER] Inbound connection from Client\n");
+    printf("[TRUSTED DEALER] Will now generate %d multiplicative triples...\n", MAX_TRIPLES);
+    generateTriples();
+    printf("[TRUSTED DEALER] Multiplicative triples generated.\n");
 
     int MAC = rand();
     MACkeyShares[SERVER] = MAC-rand();
@@ -77,14 +75,16 @@ int main() {
     assert(MACkeyShares[SERVER]+MACkeyShares[CLIENT]==MAC);
     printf("[TRUSTED DEALER] MAC shares generated.\n");
 
+    int socket_desc = bindPort(DEALER_PORT);
+    int server_desc = connectionFrom(socket_desc);
+    printf("[TRUSTED DEALER] Inbound connection from Server\n");
+    int client_desc = connectionFrom(socket_desc);
+    printf("[TRUSTED DEALER] Inbound connection from Client\n");
+
     printf("[TRUSTED DEALER] Sending now MAC key shares...\n");
     sendMACkeyShare(MACkeyShares[SERVER], server_desc);
     sendMACkeyShare(MACkeyShares[CLIENT], client_desc);
     printf("[TRUSTED DEALER] Sent MAC key shares: Server -> %d, Client -> %d.\n", MACkeyShares[SERVER], MACkeyShares[CLIENT]);
- 
-    printf("[TRUSTED DEALER] Will now generate %d multiplicative triples...\n", MAX_TRIPLES);
-    generateTriples();
-    printf("[TRUSTED DEALER] Multiplicative triples generated.\n");
 
     sendTripleShares(MultTripleShares[SERVER], MAX_TRIPLES, server_desc);
     sendTripleShares(MultTripleShares[CLIENT], MAX_TRIPLES, client_desc);

@@ -3,6 +3,8 @@
 
 // Connection primitives; wrappers
 
+#define BUFFER_SIZE 4096
+
 int bindPort(int port) {
     int ret, socket_desc;
 
@@ -59,27 +61,37 @@ int connectionTo(const char* IPaddr, int port) {
 
 // Socket operations
 
-int sendTo(int to, void* data, int size, int flags) {
+int sendTo(int to, void* data, int size, int flags) {                   // if size > BUFFER_SIZE, will split into multiple sends
     int ret, sentBytes=0;
+    int currWindow = BUFFER_SIZE;
+
     while (sentBytes<size) {
-        ret = send(to, data, size, flags);
+        if (size-sentBytes < currWindow) currWindow = size-sentBytes;
+        ret = send(to, data+sentBytes, currWindow, flags);
         if (ret<0 && errno==EINTR) continue;
         else if (ret<0) handle_error("sendTo failed");
         sentBytes += ret;
     }
-    if (VERBOSE==2) printf("Sent %d bytes.\n", sentBytes);
+
+    if (VERBOSE && sentBytes>4) printf("Sent %d bytes.\n", sentBytes);
+    else if (VERBOSE==2) printf("Sent %d bytes.\n", sentBytes);         // long prints - even 4bytes interactions
     return sentBytes;
 }
 
-int recvFrom(int from, void* buf, int size, int flags) {
+int recvFrom(int from, void* buf, int size, int flags) {                // if size > BUFFER_SIZE, will split into multiple recvs
     int ret, recvBytes=0;
+    int currWindow = BUFFER_SIZE;
+
     while (recvBytes<size) {
-        ret = recv(from, buf, size, flags);
+        if (size-recvBytes < currWindow) currWindow = size-recvBytes;
+        ret = recv(from, buf+recvBytes, currWindow, flags);
         if (ret<0 && errno==EINTR) continue;
         else if (ret<0) handle_error("recvFrom failed");
         recvBytes += ret;
     }
-    if (VERBOSE==2) printf("Received %d bytes.\n", recvBytes);
+    
+    if (VERBOSE && recvBytes>4) printf("Received %d bytes.\n", recvBytes); 
+    else if (VERBOSE==2) printf("Received %d bytes.\n", recvBytes);     // long prints - even 4bytes interactions
     return recvBytes; 
 }
 
@@ -106,7 +118,7 @@ void sendTripleShares(MultTriple* triples, int numTriples, int to) {
 MultTriple* recvTripleShares(int from) {
     int numTriples; 
     recvFrom(from, &numTriples, sizeof(int), 0);
-
+    
     MultTriple* res = malloc(numTriples*sizeof(MultTriple));
     recvFrom(from, res, numTriples*sizeof(MultTriple), 0);
     return res;
