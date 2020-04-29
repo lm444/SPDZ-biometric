@@ -3,6 +3,7 @@
 #include "Communication.h"
 #include "SPDZ.h"
 #include "Debug.h"
+#include "MultTriple.h"
 
 int MACkeyShare;
 MultTriple* MultTripleShares;
@@ -78,21 +79,25 @@ int main(int argc, char** argv) {
 	}
 	
 	// if (DEBUG) testServerFunctionalities();
+	if (CONVERTER) shrinkIrisFile("irisServer_raw.txt", IRIS_SERVER);
 
 	// Same as Client
 
-	Iris* originalIris = readIris(IRIS_SERVER);
-	Iris** shares = genIrisShares(originalIris);
+	Iris* clientIrisClear = readIris(IRIS_CLIENT); // for operation check purposes only
+
+	Iris* serverIrisClear = readIris(IRIS_CLIENT);		
+	Iris** shares = genIrisShares(serverIrisClear);
 
 	Iris* serverIris = shares[0];
 	sendIris(shares[1], client_desc);
 
 	Iris* clientIris = recvIris(client_desc);
 
-	AuthCheckClear(originalIris, originalIris);
+	AuthCheckClear(serverIrisClear, clientIrisClear);
 	spdz_hamming_dist(serverIris, clientIris, MultTripleShares, SERVER, client_desc);
 
-	destroyIris(originalIris);
+	destroyIris(serverIrisClear);
+	destroyIris(clientIrisClear);
 	destroyShares(shares); 		// will also destroy serverIris!
 	destroyIris(clientIris);
 	free(MultTripleShares);

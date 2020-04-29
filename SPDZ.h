@@ -2,14 +2,7 @@
 #define SPDZ_H_
 
 #include "Iris.h"
-
-#define MAX_TRIPLES 5000000
-
-typedef struct MultTripleStruct {
-    int a;
-    int b;
-    int c;
-} MultTriple;
+#include "MultTriple.h"
 
 void spdz_hamming_dist(Iris* iris1, Iris* iris2, MultTriple* triples, int self, int other);
 

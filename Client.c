@@ -3,6 +3,7 @@
 #include "Communication.h"
 #include "SPDZ.h"
 #include "Debug.h"
+#include "MultTriple.h"
 
 int MACkeyShare;
 MultTriple* MultTripleShares;
@@ -10,7 +11,6 @@ MultTriple* MultTripleShares;
 int server_desc, dealer_desc;
 
 void testClientFunctionalities() {
-	if (CONVERTER) shrinkIrisFile();
 	Iris* iris = readIris(IRIS_CLIENT);
 	if (VERBOSE) printIris(iris);
 
@@ -42,24 +42,29 @@ int main(int argc, char** argv) {
 		}
 	}
 
+	if (CONVERTER) shrinkIrisFile("irisClient_raw.txt", IRIS_CLIENT);
+
 	// if (DEBUG) testClientFunctionalities();
 	
 	/* clientIris will be the shares of the Client's iris 
 	   serverIris will be the shares of the Server's iris 
-	   We will operate on those two for SPDZ; originalIris won't be used */
+	   We will operate on those two for SPDZ; clientIrisClear won't be used */
 
-	Iris* originalIris = readIris(IRIS_CLIENT);
-	Iris** shares = genIrisShares(originalIris);
+	Iris* serverIrisClear = readIris(IRIS_CLIENT);		// for operation check purposes only
+
+	Iris* clientIrisClear = readIris(IRIS_CLIENT);
+	Iris** shares = genIrisShares(clientIrisClear);
 
 	Iris* clientIris = shares[0];
 	sendIris(shares[1], server_desc);
 
 	Iris* serverIris = recvIris(server_desc);
 
-	AuthCheckClear(originalIris, originalIris);
+	AuthCheckClear(clientIrisClear, serverIrisClear);
 	spdz_hamming_dist(serverIris, clientIris, MultTripleShares, CLIENT, server_desc);
 
-	destroyIris(originalIris);
+	destroyIris(clientIrisClear);
+	destroyIris(serverIrisClear);
 	destroyShares(shares); 		// will also destroy clientIris!
 	destroyIris(serverIris);
 	free(MultTripleShares);

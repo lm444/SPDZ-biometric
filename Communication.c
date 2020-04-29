@@ -110,9 +110,14 @@ int recvMACkeyShare(int from) {
     return res;
 }
 
-void sendTripleShares(MultTriple* triples, int numTriples, int to) {
-    sendTo(to, &numTriples, sizeof(int), 0);
-    sendTo(to, triples, numTriples*sizeof(MultTriple), 0);
+int sendTripleShares(MultTriple* triples, int numTriples, int to) {
+    int ret;
+    ret = sendTo(to, &numTriples, sizeof(int), 0);
+    assert(ret==4);
+
+    ret=sendTo(to, triples, numTriples*sizeof(MultTriple), 0);
+    assert(ret==numTriples*sizeof(MultTriple));
+    return numTriples;
 }
 
 MultTriple* recvTripleShares(int from) {

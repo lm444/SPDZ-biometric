@@ -8,9 +8,9 @@ void handle_error(const char* msg) {
 	exit(1);
 }
 
-void shrinkIrisFile() {
+void shrinkIrisFile(const char* inputFile, const char* destFile) {
 	int fd, ret;
-	fd = open(IRIS1, O_RDONLY);
+	fd = open(inputFile, O_RDONLY);
 	if (fd<0) handle_error("Error while opening input file");
 
 	char* buf = (char*) malloc(BUF_SIZE*sizeof(char));
@@ -45,7 +45,7 @@ void shrinkIrisFile() {
 */
 
 	int outfd;
-	outfd = open("sample.txt", O_WRONLY|O_CREAT, 0640);
+	outfd = open(destFile, O_WRONLY|O_CREAT, 0640);
 	if (outfd<0) handle_error("Error while opening output file");
 
 
@@ -55,13 +55,15 @@ void shrinkIrisFile() {
 		if (ret<0) handle_error("Write");
 		writtenBytes+=ret;
 	}
-	printf("printed %d bytes\n", writtenBytes);
+	
+	if (VERBOSE) printf("Printed %d bytes\n", writtenBytes);
 
+	if (VERBOSE==2) printf("%s\n",buf);
+	printf("[INPUT] strlen: %ld; read: %d\n", strlen(buf), readBytes);
+	if (VERBOSE==2) printf("%s\n",res);
+	printf("[OUTPUT] strlen: %ld; read: %d\n", strlen(res), validBytes);
 
-	printf("%s\n",buf);
-	printf("[GENERAL] strlen: %ld; read: %d\n", strlen(buf), readBytes);
-	printf("%s\n",res);
-	printf("[VALID] strlen: %ld; read: %d\n", strlen(res), validBytes);
+	printf("Converted %s to %s successfully.\n", inputFile, destFile);
 
 	free(buf);
 	free(res);

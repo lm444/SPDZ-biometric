@@ -14,16 +14,14 @@
 #include <assert.h>
 
 
-#define IRIS_CLIENT "sample.txt"
-#define IRIS_SERVER "sample.txt"
+#define IRIS_CLIENT "irisClient.txt"
+#define IRIS_SERVER "irisServer.txt"
 
 #define SERVER 0
 #define CLIENT 1
 
 #define THRESHOLD 0.25
 #define P_FIELD 2
-
-
 
 /* Different levels of VERBOSE:
    1 - Just some minor additional print
@@ -35,9 +33,9 @@
 #define PRINT_ELEMS 100
 
 // Later will implement the converter in a different executable
-#define CONVERTER 1
+#define CONVERTER 0
 
 void handle_error(const char* msg);
-void shrinkIrisFile();
+void shrinkIrisFile(const char* inputFile, const char* destFile);
 
 #endif
