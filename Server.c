@@ -49,6 +49,7 @@ void testServerFunctionalities() {
 	destroyShares(shares);
 	destroyIris(iris);
 	destroyIris(iris2);
+	exit(0);
 }
 
 int main(int argc, char** argv) {
@@ -64,10 +65,12 @@ int main(int argc, char** argv) {
 	MultTripleShares=recvTripleShares(dealer_desc);
 	printf("[SERVER] Received %d multiplicative triple shares.\n", MAX_TRIPLES);
 
-	// Printing all the shares of triples received
-	if (VERBOSE==2) {
-		int i;
-		for (i=0; i<MAX_TRIPLES; i++) {
+	// Printing all the shares of triples received (VERBOSE==2)
+	// or up to PRINT_ELEMS triples (VERBOSE==1) 
+	if (VERBOSE) {
+		int i, max=PRINT_ELEMS;
+		if (VERBOSE==2) max = MAX_TRIPLES;
+		for (i=0; i<max; i++) {
 			printf("MultTripleShares[%d] = %d %d %d\n", i, MultTripleShares[i].a, MultTripleShares[i].b, MultTripleShares[i].c);
 		}
 	}
@@ -84,7 +87,8 @@ int main(int argc, char** argv) {
 
 	Iris* clientIris = recvIris(client_desc);
 
-	// spdz_hamming_dist(serverIris, clientIris, MultTripleShares, SERVER, client_desc);
+	AuthCheckClear(originalIris, originalIris);
+	spdz_hamming_dist(serverIris, clientIris, MultTripleShares, SERVER, client_desc);
 
 	destroyIris(originalIris);
 	destroyShares(shares); 		// will also destroy serverIris!

@@ -23,12 +23,16 @@
 #define THRESHOLD 0.25
 #define P_FIELD 2
 
+
+
 /* Different levels of VERBOSE:
    1 - Just some minor additional print
    2 - Includes lenghty prints (care!)
 */
-#define VERBOSE 	2
+#define VERBOSE 	1
 #define DEBUG 		0
+
+#define PRINT_ELEMS 100
 
 // Later will implement the converter in a different executable
 #define CONVERTER 1

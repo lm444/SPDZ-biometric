@@ -11,6 +11,9 @@ int bindPort(int port) {
     socket_desc = socket(AF_INET, SOCK_STREAM, 0);
 	if (socket_desc<0) handle_error("Socket create");
 
+    int so_reuseaddropt = 1;
+    if (setsockopt(socket_desc, SOL_SOCKET, SO_REUSEADDR, &so_reuseaddropt, sizeof(int)) < 0) handle_error("SO_REUSEADDR setup failed");
+
 	server_addr.sin_addr.s_addr = INADDR_ANY;
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port);
@@ -64,7 +67,7 @@ int sendTo(int to, void* data, int size, int flags) {
         else if (ret<0) handle_error("sendTo failed");
         sentBytes += ret;
     }
-    if (VERBOSE) printf("Sent %d bytes.\n", sentBytes);
+    if (VERBOSE==2) printf("Sent %d bytes.\n", sentBytes);
     return sentBytes;
 }
 
@@ -76,7 +79,7 @@ int recvFrom(int from, void* buf, int size, int flags) {
         else if (ret<0) handle_error("recvFrom failed");
         recvBytes += ret;
     }
-    if (VERBOSE) printf("Received %d bytes.\n", recvBytes);
+    if (VERBOSE==2) printf("Received %d bytes.\n", recvBytes);
     return recvBytes; 
 }
 

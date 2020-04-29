@@ -6,7 +6,7 @@
    arr[0] will be related to the Server
    arr[1] will be related to the Client */
 
-#define DEBUG_RAND_MAX 100000
+#define TRIPLE_MAX_VAL 10
 
 int MACkeyShares[2];
 MultTriple* MultTripleShares[2];
@@ -26,13 +26,13 @@ void generateTriples() {
     MultTriple* clientShares = MultTripleShares[CLIENT];
 
     for (i=0; i<MAX_TRIPLES; i++) {
-        randA = rand()/DEBUG_RAND_MAX;
-        randB = rand()/DEBUG_RAND_MAX;
+        randA = rand()%TRIPLE_MAX_VAL;
+        randB = rand()%TRIPLE_MAX_VAL;
         randC = randA*randB;
 
-        serverShares[i].a = randA-rand()/DEBUG_RAND_MAX;
-        serverShares[i].b = randB-rand()/DEBUG_RAND_MAX;
-        serverShares[i].c = randC-rand()/DEBUG_RAND_MAX;
+        serverShares[i].a = randA-rand()%TRIPLE_MAX_VAL;
+        serverShares[i].b = randB-rand()%TRIPLE_MAX_VAL;
+        serverShares[i].c = randC-rand()%(TRIPLE_MAX_VAL*TRIPLE_MAX_VAL);
 
         clientShares[i].a = randA-serverShares[i].a;
         clientShares[i].b = randB-serverShares[i].b;

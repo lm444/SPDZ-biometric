@@ -2,6 +2,7 @@
 #include "Iris.h"
 #include "Communication.h"
 #include "SPDZ.h"
+#include "Debug.h"
 
 int MACkeyShare;
 MultTriple* MultTripleShares;
@@ -15,6 +16,7 @@ void testClientFunctionalities() {
 
 	sendIris(iris, server_desc);
 	destroyIris(iris);
+	exit(0);
 }
 
 int main(int argc, char** argv) {
@@ -30,9 +32,10 @@ int main(int argc, char** argv) {
 	MultTripleShares=recvTripleShares(dealer_desc);
 	printf("[CLIENT] Received %d multiplicative triple shares.\n", MAX_TRIPLES);
 	
-	if (VERBOSE==2) {
-		int i;
-		for (i=0; i<MAX_TRIPLES; i++) {
+	if (VERBOSE) {
+		int i, max=PRINT_ELEMS;
+		if (VERBOSE==2) max = MAX_TRIPLES;
+		for (i=0; i<max; i++) {
 			printf("MultTripleShares[%d] = %d %d %d\n", i, MultTripleShares[i].a, MultTripleShares[i].b, MultTripleShares[i].c);
 		}
 	}
@@ -51,7 +54,8 @@ int main(int argc, char** argv) {
 
 	Iris* serverIris = recvIris(server_desc);
 
-	// spdz_hamming_dist(serverIris, clientIris, MultTripleShares, CLIENT, server_desc);
+	AuthCheckClear(originalIris, originalIris);
+	spdz_hamming_dist(serverIris, clientIris, MultTripleShares, CLIENT, server_desc);
 
 	destroyIris(originalIris);
 	destroyShares(shares); 		// will also destroy clientIris!
