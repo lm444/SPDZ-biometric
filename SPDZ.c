@@ -7,7 +7,7 @@
 // Assumption: Everyone follows the protocol taking triples in order from their list.
 // Could guard against it, but complexity would increase (more overhead in the MultTriple struct)
 
-int T=0; // temporary global variable for debugs
+int T=10; // temporary global variable for debugs
 int spdz_mult(int x, int y, MultTriple* triple, int self, int other) {
     int epsilonShare, deltaShare; // known
     int epsilon, delta;           // each party will know them after communication
@@ -55,14 +55,15 @@ void spdz_hamming_dist(Iris* iris1, Iris* iris2, MultTriple* triples, int self, 
         int f2 = iris2->iriscode[i];
         int m1 = iris1->mask[i];
         int m2 = iris2->mask[i];
-
+        // num += (f1+f2-2*f1*f2)*(1-(m1+m2-m1*m2));
         int f1f2 = (spdz_mult(f1, f2, tracker, self, other));
         int m1m2 = (spdz_mult(m1, m2, tracker, self, other));
 
         int num1 = f1+f2-2*f1f2;
-        int num2 = 1-(m1+m2-m1m2);
+        int temp = -(m1+m2-m1m2);
+        int num2 = spdz_mult(num1, temp, tracker, self, other);
 
-        num += spdz_mult(num1, num2, tracker, self, other);
+        num += num1+num2; // FOCUS HERE
         den -= (m1+m2-m1m2);
         tracker++;
         T++;

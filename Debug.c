@@ -22,8 +22,20 @@ void AuthCheckClear(Iris* iris1, Iris* iris2) {
         int m1 = iris1->mask[i];
         int m2 = iris2->mask[i];
 
-        num += (f1+f2-2*f1*f2)*(1-(m1+m2-m1*m2));
-        den -= (m1+m2-m1*m2);
+        int f1f2 = f1*f2;
+        int m1m2 = m1*m2;
+/*
+        int num1 = f1+f2-2*f1f2;
+        int temp = -(m1+m2-m1m2);
+        int num2 = num1*temp;
+
+        num += num1+num2;
+*/
+        int num1 = f1+f2-2*f1f2;
+        int num2 = 1-(m1+m2-m1m2);
+
+        num += num1*num2;
+        den -= (m1+m2-m1m2);
     }
 
     printf("num: %d; den: %d\n", num, den);

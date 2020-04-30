@@ -53,6 +53,52 @@ void testServerFunctionalities() {
 	exit(0);
 }
 
+void testSPDZ() {
+	int i;
+	Iris* clientIrisClear = readIris(IRIS_CLIENT); // for operation check purposes only
+	Iris* serverIrisClear = readIris(IRIS_SERVER);		
+	Iris** shares = genIrisShares(serverIrisClear);
+
+	Iris* serverIris = shares[0];
+	sendIris(shares[1], client_desc);
+	sendIris(shares[0], client_desc); // will send even the Server's share, for checks clientside
+
+	Iris* clientOtherShares  = recvIris(client_desc);
+	Iris* clientSelfShares   = recvIris(client_desc);
+
+	// terminates if communication failure
+	for (i=0; i<clientIrisClear->size; i++) {
+		assert(clientOtherShares->iriscode[i]+clientSelfShares->iriscode[i]==clientIrisClear->iriscode[i]);
+		assert(clientOtherShares->mask[i]+clientSelfShares->mask[i]==clientIrisClear->mask[i]);
+	}
+
+	AuthCheckClear(serverIrisClear, clientIrisClear);
+	spdz_hamming_dist(serverIris, clientOtherShares, MultTripleShares, SERVER, client_desc);
+
+	
+	destroyIris(serverIrisClear);
+	destroyIris(clientIrisClear); // TEMP
+	destroyShares(shares); 	      // will also destroy serverIris!
+	destroyIris(clientSelfShares);
+	destroyIris(clientOtherShares);
+}
+
+void protocol() {
+	Iris* serverIrisClear = readIris(IRIS_SERVER);		
+	Iris** shares = genIrisShares(serverIrisClear);
+
+	Iris* serverIris = shares[0];
+	sendIris(shares[1], client_desc);
+
+	Iris* clientIris = recvIris(client_desc);
+
+	spdz_hamming_dist(serverIris, clientIris, MultTripleShares, SERVER, client_desc);
+
+	destroyIris(serverIrisClear);
+	destroyShares(shares); 	      // will also destroy serverIris!
+	destroyIris(clientIris);
+}
+
 int main(int argc, char** argv) {
 	socket_desc = bindPort(SERVER_PORT);
 	dealer_desc	= connectionTo(DEALER_ADDR, DEALER_PORT);
@@ -82,24 +128,9 @@ int main(int argc, char** argv) {
 	if (CONVERTER) shrinkIrisFile("irisServer_raw.txt", IRIS_SERVER);
 
 	// Same as Client
+	if (DEBUG) testSPDZ();
+	else protocol();
 
-	Iris* clientIrisClear = readIris(IRIS_CLIENT); // for operation check purposes only
-
-	Iris* serverIrisClear = readIris(IRIS_CLIENT);		
-	Iris** shares = genIrisShares(serverIrisClear);
-
-	Iris* serverIris = shares[0];
-	sendIris(shares[1], client_desc);
-
-	Iris* clientIris = recvIris(client_desc);
-
-	AuthCheckClear(serverIrisClear, clientIrisClear);
-	spdz_hamming_dist(serverIris, clientIris, MultTripleShares, SERVER, client_desc);
-
-	destroyIris(serverIrisClear);
-	destroyIris(clientIrisClear);
-	destroyShares(shares); 		// will also destroy serverIris!
-	destroyIris(clientIris);
 	free(MultTripleShares);
 
 	close(socket_desc);
