@@ -9,6 +9,7 @@ MultTripleArray* createMultTripleArray(int size) {
     res->size            = size;
     res->freeSpace       = size;
     res->nextAvailable   = 0;
+    res->nextFree        = 0;
     return res;
 }
 
@@ -16,6 +17,16 @@ void destroyMultTripleArray(MultTripleArray* arr) {
     free(arr->circularArray);
     free(arr);
 }
+
+// Returns a pointer starting from circularArray[nextAvailable].
+// Updates internal counters accordingly
+MultTriple* consumeTriples(MultTripleArray* arr, int numTriples) {
+    MultTriple* res    = arr->circularArray+arr->nextAvailable;
+    arr->freeSpace     = arr->freeSpace+numTriples;
+    arr->nextAvailable = (arr->nextAvailable+numTriples)%arr->size;
+    if (VERBOSE==2) printf("Consumed %d triple(s). New free space: %d.\n", numTriples, arr->freeSpace);
+    return res;
+} 
 
 MultTripleArray** generateTriples(int numTriples) {
     int i;

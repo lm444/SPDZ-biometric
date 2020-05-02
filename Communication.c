@@ -1,5 +1,5 @@
 #include "Common.h"
-#include "SPDZ.h"
+#include "MultTriple.h"
 
 // Connection primitives; wrappers
 
@@ -97,14 +97,11 @@ int recvFrom(int from, void* buf, int size, int flags) {                // if si
 
 // Application-specific methods
 
-// Detached from the generic sendIntShare to simplify modification
-// for a different representation of the MAC key (e.g. uint64)
-
-void sendMACkeyShare(int MACkeyShare, int to) {
-    sendTo(to, &MACkeyShare, sizeof(int), 0);
+void sendIntShare(int share, int to) {
+    sendTo(to, &share, sizeof(int), 0);
 }
 
-int recvMACkeyShare(int from) {
+int recvIntShare(int from) {
     int res;
     recvFrom(from, &res, sizeof(int), 0);
     return res;
@@ -120,21 +117,23 @@ int sendTripleShares(MultTriple* triples, int numTriples, int to) {
     return numTriples;
 }
 
-MultTriple* recvTripleShares(int from) {
+MultTripleArray* recvTripleShares(int from) {
     int numTriples; 
     recvFrom(from, &numTriples, sizeof(int), 0);
     
-    MultTriple* res = malloc(numTriples*sizeof(MultTriple));
-    recvFrom(from, res, numTriples*sizeof(MultTriple), 0);
+    MultTripleArray* res = createMultTripleArray(numTriples);
+    recvFrom(from, res->circularArray, numTriples*sizeof(MultTriple), 0);
+    res->freeSpace = res->freeSpace-numTriples;
+    res->nextFree  = (res->nextAvailable+numTriples)%res->size;
     return res;
 }
 
-void sendIntShare(int share, int to) {
-    sendTo(to, &share, sizeof(int), 0);
+// Detached from the generic sendIntShare to simplify modification
+// for a different representation of the MAC key (e.g. uint64)
+void sendMACkeyShare(int MACkeyShare, int to) {
+    sendIntShare(MACkeyShare, to);
 }
 
-int recvIntShare(int from) {
-    int res;
-    recvFrom(from, &res, sizeof(int), 0);
-    return res;
+int recvMACkeyShare(int from) {
+    return recvIntShare(from);
 }

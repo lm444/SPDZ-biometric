@@ -1,7 +1,7 @@
 #ifndef COMMUNICATIONS_H_
 #define COMMUNICATIONS_H_
 
-#include "SPDZ.h"
+#include "MultTriple.h"
 
 #define SERVER_ADDR "127.0.0.1"
 #define SERVER_PORT 5555
@@ -19,7 +19,7 @@ int recvFrom(int from, void* buf, int size, int flags);
 void sendMACkeyShare(int MACkeyShare, int to);
 int recvMACkeyShare(int from);
 int sendTripleShares(MultTriple* triples, int numTriples, int to);
-MultTriple* recvTripleShares(int from);
+MultTripleArray* recvTripleShares(int from);
 void sendIntShare(int share, int to);
 int recvIntShare(int from);
 

@@ -14,7 +14,15 @@ typedef struct MultTripleArrayStruct {
     int size;
     int freeSpace;
     int nextAvailable;
+    int nextFree;
 } MultTripleArray;
+
+
+
+MultTripleArray* createMultTripleArray(int size);
+void destroyMultTripleArray(MultTripleArray* arr);
+
+MultTriple* consumeTriples(MultTripleArray* arr, int numTriples);
 
 MultTripleArray** generateTriples(int numTriples);
 void destroyMultTripleArray(MultTripleArray* arr);

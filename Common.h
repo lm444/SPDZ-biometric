@@ -21,7 +21,7 @@
 #define CLIENT 1
 
 #define THRESHOLD 0.25
-#define P_FIELD 2
+#define P_FIELD 7
 
 /* Different levels of VERBOSE:
    1 - Just some minor additional print

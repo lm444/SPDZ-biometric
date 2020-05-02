@@ -5,15 +5,21 @@
 
 
 // Assumption: Everyone follows the protocol taking triples in order from their list.
-// Could guard against it, but complexity would increase (more overhead in the MultTriple struct)
+// Could guard against it, but complexity would increase
 
-int T=10; // temporary global variable for debugs
-int spdz_mult(int x, int y, MultTriple* triple, int self, int other) {
+int T=0; // temporary global variable for debugs
+int spdz_mult(int x, int y, MultTripleArray* triples, int self, int other) {
     int epsilonShare, deltaShare; // known
     int epsilon, delta;           // each party will know them after communication
 
-    epsilonShare = x-triple->a;
-    deltaShare   = y-triple->b;
+    MultTriple* currTriple = consumeTriples(triples, 1);
+
+    int a = currTriple->a;
+    int b = currTriple->b;
+    int c = currTriple->c;
+
+    epsilonShare = x-a;
+    deltaShare   = y-b;
     
     sendIntShare(epsilonShare, other);
     sendIntShare(deltaShare, other);
@@ -22,28 +28,23 @@ int spdz_mult(int x, int y, MultTriple* triple, int self, int other) {
 
     if (T<10) {
         printf("Check input: %d, %d\n", x, y);
-        printf("Check tripleShare: %d, %d, %d\n", triple->a, triple->b, triple->c);
+        printf("Check tripleShare: %d, %d, %d\n", a, b, c);
         printf("Check epsilon-delta: %d, %d\n", epsilon, delta);
-        printf("Check output (without +e-d): %d\n", triple->c + triple->b*epsilon + triple->a*delta);
+        printf("Check output (without +e-d): %d\n", c + b*epsilon + a*delta);
     }
 
     if (self==SERVER) 
-        return triple->c + triple->b*epsilon + triple->a*delta + epsilon*delta;
+        return c + b*epsilon + a*delta + epsilon*delta;
     else   
-        return triple->c + triple->b*epsilon + triple->a*delta;
+        return c + b*epsilon + a*delta;
 }
 
-// This method will consume triples starting from triples
-void spdz_hamming_dist(Iris* iris1, Iris* iris2, MultTriple* triples, int self, int other) {
+void spdz_hamming_dist(Iris* iris1, Iris* iris2, MultTripleArray* triples, int self, int other) {
     if (iris1->size!=iris2->size) {
         printf("Mismatching iris sizes. Skipping check.\n");
         return;
     }
-
-    MultTriple* tracker = triples;
-
-    printf("Reference tripleShare: %d, %d, %d\n", tracker->a, tracker->b, tracker->c);
-
+    
     // Hamming distance
     int i;
     int num=0, den;
@@ -56,16 +57,15 @@ void spdz_hamming_dist(Iris* iris1, Iris* iris2, MultTriple* triples, int self, 
         int m1 = iris1->mask[i];
         int m2 = iris2->mask[i];
         // num += (f1+f2-2*f1*f2)*(1-(m1+m2-m1*m2));
-        int f1f2 = (spdz_mult(f1, f2, tracker, self, other));
-        int m1m2 = (spdz_mult(m1, m2, tracker, self, other));
+        int f1f2 = (spdz_mult(f1, f2, triples, self, other));
+        int m1m2 = (spdz_mult(m1, m2, triples, self, other));
 
         int num1 = f1+f2-2*f1f2;
         int temp = -(m1+m2-m1m2);
-        int num2 = spdz_mult(num1, temp, tracker, self, other);
+        int num2 = spdz_mult(num1, temp, triples, self, other);
 
-        num += num1+num2; // FOCUS HERE
+        num += num1+num2;
         den -= (m1+m2-m1m2);
-        tracker++;
         T++;
     }
 

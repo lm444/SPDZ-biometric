@@ -6,7 +6,7 @@
 #include "MultTriple.h"
 
 int MACkeyShare;
-MultTriple* MultTripleShares;
+MultTripleArray* MultTripleShares;
 
 int client_desc, socket_desc, dealer_desc;
 
@@ -110,7 +110,7 @@ int main(int argc, char** argv) {
 	printf("[SERVER] Received MACkeyShare: %d\n", MACkeyShare);
 
 	MultTripleShares=recvTripleShares(dealer_desc);
-	printf("[SERVER] Received %d multiplicative triple shares.\n", MAX_TRIPLES);
+	printf("[SERVER] Received %d multiplicative triple sharesm %d free space.\n", MAX_TRIPLES, MultTripleShares->freeSpace);
 
 	// Printing all the shares of triples received (VERBOSE==2)
 	// or up to PRINT_ELEMS triples (VERBOSE==1) 
@@ -119,8 +119,10 @@ int main(int argc, char** argv) {
 		int reverse=MAX_TRIPLES-1;
 		if (VERBOSE==2) max = MAX_TRIPLES;
 		for (i=0; i<max; i++, reverse--) {
-			printf("MultTripleShares[%d] = %d %d %d\n", i, MultTripleShares[i].a, MultTripleShares[i].b, MultTripleShares[i].c);
-			printf("MultTripleShares[%d] = %d %d %d\n", reverse, MultTripleShares[reverse].a, MultTripleShares[reverse].b, MultTripleShares[reverse].c);
+			printf("MultTripleShares[%d] = %d %d %d\n", 
+					i, MultTripleShares->circularArray[i].a, MultTripleShares->circularArray[i].b, MultTripleShares->circularArray[i].c);
+			printf("MultTripleShares[%d] = %d %d %d\n", 
+					reverse, MultTripleShares->circularArray[reverse].a, MultTripleShares->circularArray[reverse].b, MultTripleShares->circularArray[reverse].c);
 		}
 	}
 	
@@ -131,7 +133,7 @@ int main(int argc, char** argv) {
 	if (DEBUG) testSPDZ();
 	else protocol();
 
-	free(MultTripleShares);
+	destroyMultTripleArray(MultTripleShares);
 
 	close(socket_desc);
 	close(client_desc);
