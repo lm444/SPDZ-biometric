@@ -2,18 +2,18 @@
 #define IRIS_H_
 
 // Iris size is here defined as length of the iriscode (which is the same as the mask).
-typedef struct IrisStruct {
+typedef struct Iris {
 	int* iriscode;
 	int* mask;
 	int size;
 } Iris;
 
-Iris* readIris(const char* inputFile);
-void printIris(Iris* iris);
-void destroyIris(Iris* iris);
+Iris* iris_read(const char* inputFile);
+void iris_print(Iris* iris);
+void iris_destroy(Iris* iris);
 
-void sendIris(Iris* iris, int to);
-Iris* recvIris(int from);
+void iris_send(Iris* iris, int to);
+Iris* iris_recv(int from);
 
 /*
 typedef struct IrisSharesStruct {

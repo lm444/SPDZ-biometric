@@ -12,7 +12,7 @@ int spdz_mult(int x, int y, MultTripleArray* triples, int self, int other) {
     int epsilonShare, deltaShare; // known
     int epsilon, delta;           // each party will know them after communication
 
-    MultTriple* currTriple = consumeTriples(triples, 1);
+    MultTriple* currTriple = tripleArray_consume(triples, 1);
 
     int a = currTriple->a;
     int b = currTriple->b;
@@ -39,7 +39,7 @@ int spdz_mult(int x, int y, MultTripleArray* triples, int self, int other) {
         return c + b*epsilon + a*delta;
 }
 
-void spdz_hamming_dist(Iris* iris1, Iris* iris2, MultTripleArray* triples, int self, int other) {
+void spdz_hammingDist(Iris* iris1, Iris* iris2, MultTripleArray* triples, int self, int other) {
     if (iris1->size!=iris2->size) {
         printf("Mismatching iris sizes. Skipping check.\n");
         return;

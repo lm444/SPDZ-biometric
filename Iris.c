@@ -2,7 +2,7 @@
 #include "Common.h"
 #include "Communication.h"
 
-Iris* createIris(int size) {
+Iris* iris_create(int size) {
 	Iris* res = (Iris*) malloc(sizeof(Iris));
 
 	res->size 	  = size;
@@ -13,7 +13,7 @@ Iris* createIris(int size) {
 	return res;
 }
 
-Iris* readIris(const char* inputFile) {    
+Iris* iris_read(const char* inputFile) {    
 	int fd, ret, size;
 
 	fd = open(inputFile, O_RDONLY);
@@ -24,7 +24,7 @@ Iris* readIris(const char* inputFile) {
 										   file contains both iriscode and mask; hence the /2. */
 	lseek(fd, 0, SEEK_SET); 			// resets the offset to the beginning of the file.
 
-	Iris* res = createIris(size);
+	Iris* res = iris_create(size);
 
 	// This read will populate the iriscode.
 	/* POSSIBLE OPTIMIZATION: One single read on a char* buf, then populate the iriscode
@@ -51,11 +51,11 @@ Iris* readIris(const char* inputFile) {
 		readBytes++;
 	}
 
-	if (VERBOSE==2) printIris(res);
+	if (VERBOSE==2) iris_print(res);
 	return res;
 }
 
-void printIris(Iris* iris) {
+void iris_print(Iris* iris) {
     int i;
 	printf("Printing iris %p\n", iris);
 	printf("iriscode: ");
@@ -65,7 +65,7 @@ void printIris(Iris* iris) {
 	printf("\n");
 }
 
-void destroyIris(Iris* iris) {
+void iris_destroy(Iris* iris) {
 	if (VERBOSE) printf("Freeing iris %p\n", iris);
 	free(iris->iriscode);
 	free(iris->mask);
@@ -78,8 +78,8 @@ void destroyIris(Iris* iris) {
 Iris** genIrisShares(Iris* iris) {
 	int i;
 	Iris** res = malloc(2*sizeof(Iris*));
-	res[0] = createIris(iris->size);
-	res[1] = createIris(iris->size);
+	res[0] = iris_create(iris->size);
+	res[1] = iris_create(iris->size);
 
 	for (i=0; i<iris->size; i++) {
 		res[0]->iriscode[i]=(iris->iriscode[i]-rand()+RAND_MAX/2)%P_FIELD;
@@ -116,8 +116,8 @@ void printShares(Iris** shares) {
 
 void destroyShares(Iris** shares) {
 	if (VERBOSE) printf("Freeing shares %p\n", shares);
-	destroyIris(shares[0]);
-	destroyIris(shares[1]);
+	iris_destroy(shares[0]);
+	iris_destroy(shares[1]);
 	free(shares);
 }
 
@@ -127,7 +127,7 @@ void destroyShares(Iris** shares) {
    - then, both the iriscode and the mask are sent.
    Receives will happen in the same order. */
 
-void sendIris(Iris* iris, int to) {
+void iris_send(Iris* iris, int to) {
     sendTo(to, &iris->size, sizeof(int), 0);
 
     sendTo(to, iris->iriscode, iris->size*sizeof(int), 0);
@@ -136,11 +136,11 @@ void sendIris(Iris* iris, int to) {
 	if (VERBOSE) printf("Sent iris of size: %d.\n", iris->size);
 }
 
-Iris* recvIris(int from) {
+Iris* iris_recv(int from) {
 	int size;
     recvFrom(from, &size, sizeof(int), 0);
 
-	Iris* res = createIris(size);
+	Iris* res = iris_create(size);
 
     recvFrom(from, res->iriscode, res->size*sizeof(int), 0);
     recvFrom(from, res->mask,     res->size*sizeof(int), 0);

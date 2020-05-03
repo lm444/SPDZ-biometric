@@ -2,6 +2,6 @@
 #define DEBUG_H_
 #include "Iris.h"
 
-void AuthCheckClear(Iris* iris1, Iris* iris2);
+void debug_hammingDistClear(Iris* iris1, Iris* iris2);
 
 #endif

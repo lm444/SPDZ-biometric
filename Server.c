@@ -12,11 +12,11 @@ int client_desc, socket_desc, dealer_desc;
 
 void testServerFunctionalities() {
 	// Testing Iris receiving here
-	Iris* iris = recvIris(client_desc);
-	if (VERBOSE==2) printIris(iris);
+	Iris* iris = iris_recv(client_desc);
+	if (VERBOSE==2) iris_print(iris);
 		
 	// Reading Iris from file; the same sent from Client at the moment
-	Iris* iris2 = readIris(IRIS_SERVER);
+	Iris* iris2 = iris_read(IRIS_SERVER);
 	if (iris->size!=iris2->size) {
 		printf("Mismatching sizes. Terminating... "); exit(1);
 	}
@@ -39,32 +39,32 @@ void testServerFunctionalities() {
 
 	// Checking Hamming Distance between Irises (here: same iris)
 	printf("Now will try authentication check between two same irises...\n");
-	AuthCheckClear(iris, iris2);
+	debug_hammingDistClear(iris, iris2);
 
 	// Arbitrary Iris modification
 	for (i=0; i<iris->size; i++) iris->iriscode[i]=1;
 
 	printf("Authentication check after arbitrarily modifying one of the two irises...\n");
-	AuthCheckClear(iris, iris2);
+	debug_hammingDistClear(iris, iris2);
 
 	destroyShares(shares);
-	destroyIris(iris);
-	destroyIris(iris2);
+	iris_destroy(iris);
+	iris_destroy(iris2);
 	exit(0);
 }
 
 void testSPDZ() {
 	int i;
-	Iris* clientIrisClear = readIris(IRIS_CLIENT); // for operation check purposes only
-	Iris* serverIrisClear = readIris(IRIS_SERVER);		
+	Iris* clientIrisClear = iris_read(IRIS_CLIENT); // for operation check purposes only
+	Iris* serverIrisClear = iris_read(IRIS_SERVER);		
 	Iris** shares = genIrisShares(serverIrisClear);
 
 	Iris* serverIris = shares[0];
-	sendIris(shares[1], client_desc);
-	sendIris(shares[0], client_desc); // will send even the Server's share, for checks clientside
+	iris_send(shares[1], client_desc);
+	iris_send(shares[0], client_desc); // will send even the Server's share, for checks clientside
 
-	Iris* clientOtherShares  = recvIris(client_desc);
-	Iris* clientSelfShares   = recvIris(client_desc);
+	Iris* clientOtherShares  = iris_recv(client_desc);
+	Iris* clientSelfShares   = iris_recv(client_desc);
 
 	// terminates if communication failure
 	for (i=0; i<clientIrisClear->size; i++) {
@@ -72,31 +72,31 @@ void testSPDZ() {
 		assert(clientOtherShares->mask[i]+clientSelfShares->mask[i]==clientIrisClear->mask[i]);
 	}
 
-	AuthCheckClear(serverIrisClear, clientIrisClear);
-	spdz_hamming_dist(serverIris, clientOtherShares, MultTripleShares, SERVER, client_desc);
+	debug_hammingDistClear(serverIrisClear, clientIrisClear);
+	spdz_hammingDist(serverIris, clientOtherShares, MultTripleShares, SERVER, client_desc);
 
 	
-	destroyIris(serverIrisClear);
-	destroyIris(clientIrisClear); // TEMP
+	iris_destroy(serverIrisClear);
+	iris_destroy(clientIrisClear); // TEMP
 	destroyShares(shares); 	      // will also destroy serverIris!
-	destroyIris(clientSelfShares);
-	destroyIris(clientOtherShares);
+	iris_destroy(clientSelfShares);
+	iris_destroy(clientOtherShares);
 }
 
 void protocol() {
-	Iris* serverIrisClear = readIris(IRIS_SERVER);		
+	Iris* serverIrisClear = iris_read(IRIS_SERVER);		
 	Iris** shares = genIrisShares(serverIrisClear);
 
 	Iris* serverIris = shares[0];
-	sendIris(shares[1], client_desc);
+	iris_send(shares[1], client_desc);
 
-	Iris* clientIris = recvIris(client_desc);
+	Iris* clientIris = iris_recv(client_desc);
 
-	spdz_hamming_dist(serverIris, clientIris, MultTripleShares, SERVER, client_desc);
+	spdz_hammingDist(serverIris, clientIris, MultTripleShares, SERVER, client_desc);
 
-	destroyIris(serverIrisClear);
+	iris_destroy(serverIrisClear);
 	destroyShares(shares); 	      // will also destroy serverIris!
-	destroyIris(clientIris);
+	iris_destroy(clientIris);
 }
 
 int main(int argc, char** argv) {
@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
 	MACkeyShare=recvMACkeyShare(dealer_desc);
 	printf("[SERVER] Received MACkeyShare: %d\n", MACkeyShare);
 
-	MultTripleShares=recvTripleShares(dealer_desc);
+	MultTripleShares=tripleArray_recv(dealer_desc);
 	printf("[SERVER] Received %d multiplicative triple sharesm %d free space.\n", MAX_TRIPLES, MultTripleShares->freeSpace);
 
 	// Printing all the shares of triples received (VERBOSE==2)
@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
 	if (DEBUG) testSPDZ();
 	else protocol();
 
-	destroyMultTripleArray(MultTripleShares);
+	tripleArray_destroy(MultTripleShares);
 
 	close(socket_desc);
 	close(client_desc);

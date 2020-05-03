@@ -5,7 +5,7 @@
 #include "Common.h"
 #include "Iris.h"
 
-void AuthCheckClear(Iris* iris1, Iris* iris2) {
+void debug_hammingDistClear(Iris* iris1, Iris* iris2) {
     if (iris1->size!=iris2->size) {
         printf("Mismatching iris sizes. Skipping check.\n");
         return;
@@ -38,7 +38,7 @@ void AuthCheckClear(Iris* iris1, Iris* iris2) {
         den -= (m1+m2-m1m2);
     }
 
-    printf("num: %d; den: %d\n", num, den);
+    printf("[DEBUG_HD] num: %d; den: %d\n", num, den);
 
     if (num<den*THRESHOLD) printf("Authentication succeded.\n");
     else printf("Authentication failed.\n");

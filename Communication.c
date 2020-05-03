@@ -107,27 +107,6 @@ int recvIntShare(int from) {
     return res;
 }
 
-int sendTripleShares(MultTriple* triples, int numTriples, int to) {
-    int ret;
-    ret = sendTo(to, &numTriples, sizeof(int), 0);
-    assert(ret==4);
-
-    ret=sendTo(to, triples, numTriples*sizeof(MultTriple), 0);
-    assert(ret==numTriples*sizeof(MultTriple));
-    return numTriples;
-}
-
-MultTripleArray* recvTripleShares(int from) {
-    int numTriples; 
-    recvFrom(from, &numTriples, sizeof(int), 0);
-    
-    MultTripleArray* res = createMultTripleArray(numTriples);
-    recvFrom(from, res->triples, numTriples*sizeof(MultTriple), 0);
-    res->freeSpace = res->freeSpace-numTriples;
-    res->nextFree  = (res->nextAvailable+numTriples)%res->size;
-    return res;
-}
-
 // Detached from the generic sendIntShare to simplify modification
 // for a different representation of the MAC key (e.g. uint64)
 void sendMACkeyShare(int MACkeyShare, int to) {

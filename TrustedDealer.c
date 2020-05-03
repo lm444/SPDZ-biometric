@@ -40,13 +40,13 @@ int main() {
     printf("[TRUSTED DEALER] Sent MAC key shares: Server -> %d, Client -> %d.\n", MACkeyShares[SERVER], MACkeyShares[CLIENT]);
 
     printf("[TRUSTED DEALER] Sending now multiplicative triples key shares...\n");
-    ret=sendTripleShares(MultTripleShares[SERVER]->triples, MAX_TRIPLES, server_desc);
+    ret=tripleArray_send(MultTripleShares[SERVER], MAX_TRIPLES, server_desc);
     printf("[TRUSTED DEALER] Sent %d multiplicative triples to Server.\n", ret);
-    ret=sendTripleShares(MultTripleShares[CLIENT]->triples, MAX_TRIPLES, client_desc);
+    ret=tripleArray_send(MultTripleShares[CLIENT], MAX_TRIPLES, client_desc);
     printf("[TRUSTED DEALER] Sent %d multiplicative triples to Client.\n", ret);
     
-    destroyMultTripleArray(MultTripleShares[SERVER]);
-    destroyMultTripleArray(MultTripleShares[CLIENT]);
+    tripleArray_destroy(MultTripleShares[SERVER]);
+    tripleArray_destroy(MultTripleShares[CLIENT]);
     free(MultTripleShares);
 
     close(socket_desc);

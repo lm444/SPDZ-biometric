@@ -11,27 +11,27 @@ MultTripleArray* MultTripleShares;
 int server_desc, dealer_desc;
 
 void testClientFunctionalities() {
-	Iris* iris = readIris(IRIS_CLIENT);
-	if (VERBOSE==2) printIris(iris);
+	Iris* iris = iris_read(IRIS_CLIENT);
+	if (VERBOSE==2) iris_print(iris);
 
-	sendIris(iris, server_desc);
-	destroyIris(iris);
+	iris_send(iris, server_desc);
+	iris_destroy(iris);
 	exit(0);
 }
 
 void testSPDZ() {
 	int i;
-	Iris* serverIrisClear = readIris(IRIS_SERVER);		// for operation check purposes only
+	Iris* serverIrisClear = iris_read(IRIS_SERVER);		// for operation check purposes only
 
-	Iris* clientIrisClear = readIris(IRIS_CLIENT);
+	Iris* clientIrisClear = iris_read(IRIS_CLIENT);
 	Iris** shares = genIrisShares(clientIrisClear);
 
 	Iris* clientIris = shares[0];
-	sendIris(shares[1], server_desc);
-	sendIris(shares[0], server_desc);
+	iris_send(shares[1], server_desc);
+	iris_send(shares[0], server_desc);
 
-	Iris* serverOtherShares = recvIris(server_desc);
-	Iris* serverSelfShares  = recvIris(server_desc);
+	Iris* serverOtherShares = iris_recv(server_desc);
+	Iris* serverSelfShares  = iris_recv(server_desc);
 
 	// terminates if communication failure
 	for (i=0; i<clientIrisClear->size; i++) {
@@ -39,14 +39,14 @@ void testSPDZ() {
 		assert(serverOtherShares->mask[i]+serverSelfShares->mask[i]==serverIrisClear->mask[i]);
 	}
 
-	AuthCheckClear(clientIrisClear, serverIrisClear);
-	spdz_hamming_dist(serverOtherShares, clientIris, MultTripleShares, CLIENT, server_desc);
+	debug_hammingDistClear(clientIrisClear, serverIrisClear);
+	spdz_hammingDist(serverOtherShares, clientIris, MultTripleShares, CLIENT, server_desc);
 
-	destroyIris(clientIrisClear);
-	destroyIris(serverIrisClear); // TEMP
+	iris_destroy(clientIrisClear);
+	iris_destroy(serverIrisClear); // TEMP
 	destroyShares(shares); 	      // will also destroy clientIris!
-	destroyIris(serverOtherShares); 
-	destroyIris(serverSelfShares);
+	iris_destroy(serverOtherShares); 
+	iris_destroy(serverSelfShares);
 }
 
 void protocol() {
@@ -54,19 +54,19 @@ void protocol() {
 	   serverIris will be the shares of the Server's iris 
 	   We will operate on those two for SPDZ; clientIrisClear won't be used */
 	   
-	Iris* clientIrisClear = readIris(IRIS_CLIENT);
+	Iris* clientIrisClear = iris_read(IRIS_CLIENT);
 	Iris** shares = genIrisShares(clientIrisClear);
 
 	Iris* clientIris = shares[0];
-	sendIris(shares[1], server_desc);
+	iris_send(shares[1], server_desc);
 
-	Iris* serverIris = recvIris(server_desc);
+	Iris* serverIris = iris_recv(server_desc);
 
-	spdz_hamming_dist(serverIris, clientIris, MultTripleShares, CLIENT, server_desc);
+	spdz_hammingDist(serverIris, clientIris, MultTripleShares, CLIENT, server_desc);
 
-	destroyIris(clientIrisClear);
+	iris_destroy(clientIrisClear);
 	destroyShares(shares); 	      // will also destroy clientIris!
-	destroyIris(serverIris); 
+	iris_destroy(serverIris); 
 }
 
 int main(int argc, char** argv) {
@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
 	MACkeyShare=recvMACkeyShare(dealer_desc);
 	printf("[CLIENT] Received MACkeyShare: %d\n", MACkeyShare);
 
-	MultTripleShares=recvTripleShares(dealer_desc);
+	MultTripleShares=tripleArray_recv(dealer_desc);
 	printf("[CLIENT] Received %d multiplicative triple shares, %d free space.\n", MAX_TRIPLES, MultTripleShares->freeSpace);
 	
 	if (VERBOSE) {
@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
 	if (DEBUG) testSPDZ();
 	else protocol();
 
-	destroyMultTripleArray(MultTripleShares);
+	tripleArray_destroy(MultTripleShares);
 
 	close(server_desc);
 	close(dealer_desc);

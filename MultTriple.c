@@ -1,9 +1,10 @@
 #include "MultTriple.h"
+#include "Communication.h"
 #include "Common.h"
 
 #define TRIPLE_MAX_VAL 10
 
-MultTripleArray* createMultTripleArray(int size) {
+MultTripleArray* tripleArray_create(int size) {
     MultTripleArray* res = (MultTripleArray*) malloc(sizeof(MultTripleArray));
     res->triples         = (MultTriple*) malloc(size*sizeof(MultTriple));
     res->size            = size;
@@ -13,20 +14,21 @@ MultTripleArray* createMultTripleArray(int size) {
     return res;
 }
 
-void destroyMultTripleArray(MultTripleArray* arr) {
+void tripleArray_destroy(MultTripleArray* arr) {
     free(arr->triples);
     free(arr);
 }
 
-// Returns a pointer starting from circularArray[nextAvailable].
+// Returns a pointer starting from triples[nextAvailable].
 // Updates internal counters accordingly
-MultTriple* consumeTriples(MultTripleArray* arr, int numTriples) {
+MultTriple* tripleArray_consume(MultTripleArray* arr, int numTriples) {
     MultTriple* res    = arr->triples+arr->nextAvailable;
     arr->freeSpace     = arr->freeSpace+numTriples;
     arr->nextAvailable = (arr->nextAvailable+numTriples)%arr->size;
-    if (VERBOSE==2) printf("Consumed %d triple(s). New free space: %d.\n", numTriples, arr->freeSpace);
+    if (VERBOSE && numTriples>1) printf("Consumed %d triple(s). New free space: %d.\n", numTriples, arr->freeSpace);
+    else if (VERBOSE==2) printf("Consumed %d triple(s). New free space: %d.\n", numTriples, arr->freeSpace);
     return res;
-} 
+}
 
 MultTripleArray** generateTriples(int numTriples) {
     int i;
@@ -34,8 +36,8 @@ MultTripleArray** generateTriples(int numTriples) {
 
     MultTripleArray** res = (MultTripleArray**) malloc(2*sizeof(MultTriple*));
 
-    res[SERVER] = createMultTripleArray(numTriples);
-    res[CLIENT] = createMultTripleArray(numTriples);
+    res[SERVER] = tripleArray_create(numTriples);
+    res[CLIENT] = tripleArray_create(numTriples);
     
     // Will compact a bit references.
 
@@ -76,5 +78,29 @@ MultTripleArray** generateTriples(int numTriples) {
     res[SERVER]->nextFree  = (res[SERVER]->nextAvailable+numTriples)%res[SERVER]->size;
     res[CLIENT]->freeSpace = res[CLIENT]->freeSpace-numTriples;
     res[CLIENT]->nextFree  = (res[CLIENT]->nextAvailable+numTriples)%res[CLIENT]->size;
+    return res;
+}
+
+// Will send only the actual triples.
+// Other fields will be reconstructed by the recipient.
+int tripleArray_send(MultTripleArray* arr, int numTriples, int to) {
+    int ret;
+    MultTriple* triples = tripleArray_consume(arr, numTriples);
+    ret = sendTo(to, &numTriples, sizeof(int), 0);
+    assert(ret==4);
+
+    ret=sendTo(to, triples, numTriples*sizeof(MultTriple), 0);
+    assert(ret==numTriples*sizeof(MultTriple));
+    return numTriples;
+}
+
+MultTripleArray* tripleArray_recv(int from) {
+    int numTriples; 
+    recvFrom(from, &numTriples, sizeof(int), 0);
+    
+    MultTripleArray* res = tripleArray_create(numTriples);
+    recvFrom(from, res->triples, numTriples*sizeof(MultTriple), 0);
+    res->freeSpace = res->freeSpace-numTriples;
+    res->nextFree  = (res->nextAvailable+numTriples)%res->size;
     return res;
 }
