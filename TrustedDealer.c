@@ -2,6 +2,8 @@
 #include "Communication.h"
 #include "MultTriple.h"
 
+#define MAXVAL_MAC 100000
+
 /* Every share will be structured in an array of two fields
    arr[0] will be related to the Server
    arr[1] will be related to the Client */
@@ -17,8 +19,8 @@ int main() {
     MultTripleShares = generateTriples(MAX_TRIPLES);
     printf("[TRUSTED DEALER] Multiplicative triples generated.\n");
 
-    int MAC = rand();
-    MACkeyShares[SERVER] = MAC-rand();
+    int MAC = rand()%MAXVAL_MAC;
+    MACkeyShares[SERVER] = (MAC-(rand()-RAND_MAX/2))%MAXVAL_MAC;
     MACkeyShares[CLIENT] = MAC-MACkeyShares[SERVER];
     assert(MACkeyShares[SERVER]+MACkeyShares[CLIENT]==MAC);
     printf("[TRUSTED DEALER] MAC shares generated.\n");
@@ -38,9 +40,9 @@ int main() {
     printf("[TRUSTED DEALER] Sent MAC key shares: Server -> %d, Client -> %d.\n", MACkeyShares[SERVER], MACkeyShares[CLIENT]);
 
     printf("[TRUSTED DEALER] Sending now multiplicative triples key shares...\n");
-    ret=sendTripleShares(MultTripleShares[SERVER]->circularArray, MAX_TRIPLES, server_desc);
+    ret=sendTripleShares(MultTripleShares[SERVER]->triples, MAX_TRIPLES, server_desc);
     printf("[TRUSTED DEALER] Sent %d multiplicative triples to Server.\n", ret);
-    ret=sendTripleShares(MultTripleShares[CLIENT]->circularArray, MAX_TRIPLES, client_desc);
+    ret=sendTripleShares(MultTripleShares[CLIENT]->triples, MAX_TRIPLES, client_desc);
     printf("[TRUSTED DEALER] Sent %d multiplicative triples to Client.\n", ret);
     
     destroyMultTripleArray(MultTripleShares[SERVER]);

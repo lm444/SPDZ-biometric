@@ -122,7 +122,7 @@ MultTripleArray* recvTripleShares(int from) {
     recvFrom(from, &numTriples, sizeof(int), 0);
     
     MultTripleArray* res = createMultTripleArray(numTriples);
-    recvFrom(from, res->circularArray, numTriples*sizeof(MultTriple), 0);
+    recvFrom(from, res->triples, numTriples*sizeof(MultTriple), 0);
     res->freeSpace = res->freeSpace-numTriples;
     res->nextFree  = (res->nextAvailable+numTriples)%res->size;
     return res;

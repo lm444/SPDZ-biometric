@@ -10,7 +10,7 @@ typedef struct MultTripleStruct {
 } MultTriple;
 
 typedef struct MultTripleArrayStruct {
-    MultTriple* circularArray;
+    MultTriple* triples;
     int size;
     int freeSpace;
     int nextAvailable;

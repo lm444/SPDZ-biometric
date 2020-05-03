@@ -88,9 +88,9 @@ int main(int argc, char** argv) {
 		if (VERBOSE==2) max = MAX_TRIPLES;
 		for (i=0; i<max; i++, reverse--) {
 			printf("MultTripleShares[%d] = %d %d %d\n", 
-					i, MultTripleShares->circularArray[i].a, MultTripleShares->circularArray[i].b, MultTripleShares->circularArray[i].c);
+					i, MultTripleShares->triples[i].a, MultTripleShares->triples[i].b, MultTripleShares->triples[i].c);
 			printf("MultTripleShares[%d] = %d %d %d\n", 
-					reverse, MultTripleShares->circularArray[reverse].a, MultTripleShares->circularArray[reverse].b, MultTripleShares->circularArray[reverse].c);
+					reverse, MultTripleShares->triples[reverse].a, MultTripleShares->triples[reverse].b, MultTripleShares->triples[reverse].c);
 		}
 	}
 
@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
 	else protocol();
 
 	destroyMultTripleArray(MultTripleShares);
-	
+
 	close(server_desc);
 	close(dealer_desc);
 	return 0;

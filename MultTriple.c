@@ -5,7 +5,7 @@
 
 MultTripleArray* createMultTripleArray(int size) {
     MultTripleArray* res = (MultTripleArray*) malloc(sizeof(MultTripleArray));
-    res->circularArray   = (MultTriple*) malloc(size*sizeof(MultTriple));
+    res->triples         = (MultTriple*) malloc(size*sizeof(MultTriple));
     res->size            = size;
     res->freeSpace       = size;
     res->nextAvailable   = 0;
@@ -14,14 +14,14 @@ MultTripleArray* createMultTripleArray(int size) {
 }
 
 void destroyMultTripleArray(MultTripleArray* arr) {
-    free(arr->circularArray);
+    free(arr->triples);
     free(arr);
 }
 
 // Returns a pointer starting from circularArray[nextAvailable].
 // Updates internal counters accordingly
 MultTriple* consumeTriples(MultTripleArray* arr, int numTriples) {
-    MultTriple* res    = arr->circularArray+arr->nextAvailable;
+    MultTriple* res    = arr->triples+arr->nextAvailable;
     arr->freeSpace     = arr->freeSpace+numTriples;
     arr->nextAvailable = (arr->nextAvailable+numTriples)%arr->size;
     if (VERBOSE==2) printf("Consumed %d triple(s). New free space: %d.\n", numTriples, arr->freeSpace);
@@ -39,8 +39,8 @@ MultTripleArray** generateTriples(int numTriples) {
     
     // Will compact a bit references.
 
-    MultTriple* serverShares = res[SERVER]->circularArray;
-    MultTriple* clientShares = res[CLIENT]->circularArray;
+    MultTriple* serverShares = res[SERVER]->triples;
+    MultTriple* clientShares = res[CLIENT]->triples;
 
     for (i=0; i<MAX_TRIPLES; i++) {
         randA = rand()%TRIPLE_MAX_VAL;
@@ -71,5 +71,10 @@ MultTripleArray** generateTriples(int numTriples) {
             if (VERBOSE==2) printf("\n");
         }
     }
+
+    res[SERVER]->freeSpace = res[SERVER]->freeSpace-numTriples;
+    res[SERVER]->nextFree  = (res[SERVER]->nextAvailable+numTriples)%res[SERVER]->size;
+    res[CLIENT]->freeSpace = res[CLIENT]->freeSpace-numTriples;
+    res[CLIENT]->nextFree  = (res[CLIENT]->nextAvailable+numTriples)%res[CLIENT]->size;
     return res;
 }
