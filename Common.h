@@ -30,7 +30,7 @@
 #define VERBOSE 	1
 #define DEBUG 		1
 
-#define PRINT_ELEMS 100
+#define DEBUG_PRINTELEMS 100
 
 // Later will implement the converter in a different executable
 #define CONVERTER 0

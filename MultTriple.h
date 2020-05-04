@@ -17,17 +17,14 @@ typedef struct MultTripleArray {
     int nextFree;
 } MultTripleArray;
 
-
-
 MultTripleArray* tripleArray_create(int size);
 void tripleArray_destroy(MultTripleArray* arr);
 MultTriple* tripleArray_consume(MultTripleArray* arr, int numTriples);
+void tripleArray_print(MultTripleArray* arr);
 
 int tripleArray_send(MultTripleArray* arr, int numTriples, int to);
 MultTripleArray* tripleArray_recv(int from);
 
 MultTripleArray** generateTriples(int numTriples);
-
-
 
 #endif

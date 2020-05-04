@@ -13,8 +13,8 @@ int bindPort(int port) {
     socket_desc = socket(AF_INET, SOCK_STREAM, 0);
 	if (socket_desc<0) handle_error("Socket create");
 
-    int so_reuseaddropt = 1;
-    if (setsockopt(socket_desc, SOL_SOCKET, SO_REUSEADDR, &so_reuseaddropt, sizeof(int)) < 0) handle_error("SO_REUSEADDR setup failed");
+    int so_reuseaddr_opt = 1;
+    if (setsockopt(socket_desc, SOL_SOCKET, SO_REUSEADDR, &so_reuseaddr_opt, sizeof(int)) < 0) handle_error("SO_REUSEADDR setup failed");
 
 	server_addr.sin_addr.s_addr = INADDR_ANY;
 	server_addr.sin_family = AF_INET;

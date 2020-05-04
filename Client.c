@@ -43,8 +43,8 @@ void testSPDZ() {
 	spdz_hammingDist(serverOtherShares, clientIris, MultTripleShares, CLIENT, server_desc);
 
 	iris_destroy(clientIrisClear);
-	iris_destroy(serverIrisClear); // TEMP
-	destroyShares(shares); 	      // will also destroy clientIris!
+	iris_destroy(serverIrisClear); 
+	destroyShares(shares); 	       // will also destroy clientIris!
 	iris_destroy(serverOtherShares); 
 	iris_destroy(serverSelfShares);
 }
@@ -82,17 +82,7 @@ int main(int argc, char** argv) {
 	MultTripleShares=tripleArray_recv(dealer_desc);
 	printf("[CLIENT] Received %d multiplicative triple shares, %d free space.\n", MAX_TRIPLES, MultTripleShares->freeSpace);
 	
-	if (VERBOSE) {
-		int i, max=PRINT_ELEMS;
-		int reverse = MAX_TRIPLES-1;
-		if (VERBOSE==2) max = MAX_TRIPLES;
-		for (i=0; i<max; i++, reverse--) {
-			printf("MultTripleShares[%d] = %d %d %d\n", 
-					i, MultTripleShares->triples[i].a, MultTripleShares->triples[i].b, MultTripleShares->triples[i].c);
-			printf("MultTripleShares[%d] = %d %d %d\n", 
-					reverse, MultTripleShares->triples[reverse].a, MultTripleShares->triples[reverse].b, MultTripleShares->triples[reverse].c);
-		}
-	}
+	if (VERBOSE) tripleArray_print(MultTripleShares);
 
 	if (CONVERTER) shrinkIrisFile("irisClient_raw.txt", IRIS_CLIENT);
 

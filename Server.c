@@ -112,19 +112,7 @@ int main(int argc, char** argv) {
 	MultTripleShares=tripleArray_recv(dealer_desc);
 	printf("[SERVER] Received %d multiplicative triple sharesm %d free space.\n", MAX_TRIPLES, MultTripleShares->freeSpace);
 
-	// Printing all the shares of triples received (VERBOSE==2)
-	// or up to PRINT_ELEMS triples (VERBOSE==1) 
-	if (VERBOSE) {
-		int i, max=PRINT_ELEMS;
-		int reverse=MAX_TRIPLES-1;
-		if (VERBOSE==2) max = MAX_TRIPLES;
-		for (i=0; i<max; i++, reverse--) {
-			printf("MultTripleShares[%d] = %d %d %d\n", 
-					i, MultTripleShares->triples[i].a, MultTripleShares->triples[i].b, MultTripleShares->triples[i].c);
-			printf("MultTripleShares[%d] = %d %d %d\n", 
-					reverse, MultTripleShares->triples[reverse].a, MultTripleShares->triples[reverse].b, MultTripleShares->triples[reverse].c);
-		}
-	}
+	if (VERBOSE) tripleArray_print(MultTripleShares);
 	
 	// if (DEBUG) testServerFunctionalities();
 	if (CONVERTER) shrinkIrisFile("irisServer_raw.txt", IRIS_SERVER);
