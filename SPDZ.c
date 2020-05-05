@@ -3,12 +3,11 @@
 #include "Communication.h"
 #include "Iris.h"
 
-
 // Assumption: Everyone follows the protocol taking triples in order from their list.
 // Could guard against it, but complexity would increase
 
 int T=0; // temporary global variable for debugs
-int spdz_mult(int x, int y, MultTripleArray* triples, int self, int other) {
+int spdz_mult(int x, int y, MultTripleArray* triples, int self, int other, OpenValArray* openValues) {
     int epsilonShare, deltaShare; // known
     int epsilon, delta;           // each party will know them after communication
 
@@ -21,10 +20,13 @@ int spdz_mult(int x, int y, MultTripleArray* triples, int self, int other) {
     epsilonShare = x-a;
     deltaShare   = y-b;
     
-    sendIntShare(epsilonShare, other);
-    sendIntShare(deltaShare, other);
-    epsilon = epsilonShare + recvIntShare(other);
-    delta   = deltaShare   + recvIntShare(other);
+    sendInt(epsilonShare, other);
+    sendInt(deltaShare, other);
+    epsilon = epsilonShare + recvInt(other);
+    delta   = deltaShare   + recvInt(other);
+
+    openValArray_insert(openValues, epsilon);
+    openValArray_insert(openValues, delta);
 
     if (T<10) {
         printf("Check input: %d, %d\n", x, y);
@@ -39,12 +41,12 @@ int spdz_mult(int x, int y, MultTripleArray* triples, int self, int other) {
         return c + b*epsilon + a*delta;
 }
 
-void spdz_hammingDist(Iris* iris1, Iris* iris2, MultTripleArray* triples, int self, int other) {
+void spdz_hammingDist(Iris* iris1, Iris* iris2, MultTripleArray* triples, int self, int other, OpenValArray* openValues) {
     if (iris1->size!=iris2->size) {
         printf("Mismatching iris sizes. Skipping check.\n");
         return;
     }
-    
+
     // Hamming distance
     int i;
     int num=0, den;
@@ -57,12 +59,12 @@ void spdz_hammingDist(Iris* iris1, Iris* iris2, MultTripleArray* triples, int se
         int m1 = iris1->mask[i];
         int m2 = iris2->mask[i];
         // num += (f1+f2-2*f1*f2)*(1-(m1+m2-m1*m2));
-        int f1f2 = (spdz_mult(f1, f2, triples, self, other));
-        int m1m2 = (spdz_mult(m1, m2, triples, self, other));
+        int f1f2 = (spdz_mult(f1, f2, triples, self, other, openValues));
+        int m1m2 = (spdz_mult(m1, m2, triples, self, other, openValues));
 
         int num1 = f1+f2-2*f1f2;
         int temp = -(m1+m2-m1m2);
-        int num2 = spdz_mult(num1, temp, triples, self, other);
+        int num2 = spdz_mult(num1, temp, triples, self, other, openValues);
 
         num += num1+num2;
         den -= (m1+m2-m1m2);

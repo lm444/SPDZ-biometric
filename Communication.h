@@ -16,7 +16,7 @@ int recvFrom(int from, void* buf, int size, int flags);
 
 void sendMACkeyShare(int MACkeyShare, int to);
 int recvMACkeyShare(int from);
-void sendIntShare(int share, int to);
-int recvIntShare(int from);
+void sendInt(int share, int to);
+int recvInt(int from);
 
 #endif

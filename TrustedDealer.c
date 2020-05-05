@@ -44,6 +44,12 @@ int main() {
     printf("[TRUSTED DEALER] Sent %d multiplicative triples to Server.\n", ret);
     ret=tripleArray_send(MultTripleShares[CLIENT], MAX_TRIPLES, client_desc);
     printf("[TRUSTED DEALER] Sent %d multiplicative triples to Client.\n", ret);
+
+    // Client and Server has to generate the same random vector.
+    int seed = rand();
+    printf("[TRUSTED DEALER] Sending seed %d for the random value generation (for MAC check).\n", seed);
+    sendInt(seed, server_desc);
+    sendInt(seed, client_desc);
     
     tripleArray_destroy(MultTripleShares[SERVER]);
     tripleArray_destroy(MultTripleShares[CLIENT]);

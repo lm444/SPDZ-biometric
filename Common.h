@@ -13,7 +13,6 @@
 #include <errno.h>
 #include <assert.h>
 
-
 #define IRIS_CLIENT "irisClient.txt"
 #define IRIS_SERVER "irisServer.txt"
 
@@ -30,7 +29,7 @@
 #define VERBOSE 	1
 #define DEBUG 		1
 
-#define DEBUG_PRINTELEMS 100
+#define DEBUG_PRINTELEMS 10
 
 // Later will implement the converter in a different executable
 #define CONVERTER 0

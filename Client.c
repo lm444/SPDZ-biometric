@@ -4,9 +4,14 @@
 #include "SPDZ.h"
 #include "Debug.h"
 #include "MultTriple.h"
+#include "RandArray.h"
+#include "OpenValArray.h"
 
 int MACkeyShare;
 MultTripleArray* MultTripleShares;
+int seed;
+RandArray* randArray;
+OpenValArray* openValArray;
 
 int server_desc, dealer_desc;
 
@@ -40,7 +45,7 @@ void testSPDZ() {
 	}
 
 	debug_hammingDistClear(clientIrisClear, serverIrisClear);
-	spdz_hammingDist(serverOtherShares, clientIris, MultTripleShares, CLIENT, server_desc);
+	spdz_hammingDist(serverOtherShares, clientIris, MultTripleShares, CLIENT, server_desc, openValArray);
 
 	iris_destroy(clientIrisClear);
 	iris_destroy(serverIrisClear); 
@@ -62,7 +67,7 @@ void protocol() {
 
 	Iris* serverIris = iris_recv(server_desc);
 
-	spdz_hammingDist(serverIris, clientIris, MultTripleShares, CLIENT, server_desc);
+	spdz_hammingDist(serverIris, clientIris, MultTripleShares, CLIENT, server_desc, openValArray);
 
 	iris_destroy(clientIrisClear);
 	destroyShares(shares); 	      // will also destroy clientIris!
@@ -82,8 +87,19 @@ int main(int argc, char** argv) {
 	MultTripleShares=tripleArray_recv(dealer_desc);
 	printf("[CLIENT] Received %d multiplicative triple shares, %d free space.\n", MAX_TRIPLES, MultTripleShares->freeSpace);
 	
-	if (VERBOSE) tripleArray_print(MultTripleShares);
+	seed=recvInt(dealer_desc);
+	printf("[CLIENT] Received seed %d.\n", seed);
 
+	randArray=randArray_create(MultTripleShares->size);
+	randArray_populate(randArray, seed);
+	randArray_print(randArray);
+	printf("[CLIENT] Generated random values for the MAC check.\n");
+
+	openValArray=openValArray_create(MultTripleShares->size);
+	printf("[CLIENT] Initialized the open values structure.\n");
+
+	if (VERBOSE) tripleArray_print(MultTripleShares);
+ 
 	if (CONVERTER) shrinkIrisFile("irisClient_raw.txt", IRIS_CLIENT);
 
 	// if (DEBUG) testClientFunctionalities();
@@ -91,6 +107,10 @@ int main(int argc, char** argv) {
 	if (DEBUG) testSPDZ();
 	else protocol();
 
+	openValArray_print(openValArray);
+
+	openValArray_destroy(openValArray);
+	randArray_destroy(randArray);
 	tripleArray_destroy(MultTripleShares);
 
 	close(server_desc);

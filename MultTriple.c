@@ -34,14 +34,14 @@ MultTriple* tripleArray_consume(MultTripleArray* arr, int numTriples) {
 // else will print the first and the last DEBUG_ELEMS elems
 void tripleArray_print(MultTripleArray* arr) {
 	int i, max=DEBUG_PRINTELEMS;
-	int reverse=MAX_TRIPLES-1;
-	if (VERBOSE==2) max = MAX_TRIPLES;
+	int reverse=arr->size-1;
+	if (VERBOSE==2) max = arr->size;
     MultTriple* triples = arr->triples;
 
 	for (i=0; i<max; i++) {
-		printf("MultTripleShares[%d] = %d %d %d\n", i, triples[i].a, triples[i].b, triples[i].c);
+		printf("Triple[%d] = %d %d %d\n", i, triples[i].a, triples[i].b, triples[i].c);
 		if (VERBOSE<2) {
-            printf("MultTripleShares[%d] = %d %d %d\n", reverse, triples[reverse].a, triples[reverse].b, triples[reverse].c);
+            printf("Triple[%d] = %d %d %d\n", reverse, triples[reverse].a, triples[reverse].b, triples[reverse].c);
             reverse--;
         }
 	}

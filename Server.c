@@ -4,9 +4,14 @@
 #include "SPDZ.h"
 #include "Debug.h"
 #include "MultTriple.h"
+#include "RandArray.h"
+#include "OpenValArray.h"
 
 int MACkeyShare;
 MultTripleArray* MultTripleShares;
+int seed;
+RandArray* randArray;
+OpenValArray* openValArray;
 
 int client_desc, socket_desc, dealer_desc;
 
@@ -73,7 +78,7 @@ void testSPDZ() {
 	}
 
 	debug_hammingDistClear(serverIrisClear, clientIrisClear);
-	spdz_hammingDist(serverIris, clientOtherShares, MultTripleShares, SERVER, client_desc);
+	spdz_hammingDist(serverIris, clientOtherShares, MultTripleShares, SERVER, client_desc, openValArray);
 
 	
 	iris_destroy(serverIrisClear);
@@ -92,7 +97,7 @@ void protocol() {
 
 	Iris* clientIris = iris_recv(client_desc);
 
-	spdz_hammingDist(serverIris, clientIris, MultTripleShares, SERVER, client_desc);
+	spdz_hammingDist(serverIris, clientIris, MultTripleShares, SERVER, client_desc, openValArray);
 
 	iris_destroy(serverIrisClear);
 	destroyShares(shares); 	      // will also destroy serverIris!
@@ -112,6 +117,17 @@ int main(int argc, char** argv) {
 	MultTripleShares=tripleArray_recv(dealer_desc);
 	printf("[SERVER] Received %d multiplicative triple sharesm %d free space.\n", MAX_TRIPLES, MultTripleShares->freeSpace);
 
+	seed=recvInt(dealer_desc);
+	printf("[SERVER] Received seed %d.\n", seed);
+
+	randArray=randArray_create(MultTripleShares->size);
+	randArray_populate(randArray, seed);
+	randArray_print(randArray);
+	printf("[SERVER] Generated random values for the MAC check.\n");
+
+	openValArray=openValArray_create(MultTripleShares->size);
+	printf("[SERVER] Initialized the open values structure.\n");
+
 	if (VERBOSE) tripleArray_print(MultTripleShares);
 	
 	// if (DEBUG) testServerFunctionalities();
@@ -121,6 +137,10 @@ int main(int argc, char** argv) {
 	if (DEBUG) testSPDZ();
 	else protocol();
 
+	openValArray_print(openValArray);
+
+	openValArray_destroy(openValArray);
+	randArray_destroy(randArray);
 	tripleArray_destroy(MultTripleShares);
 
 	close(socket_desc);

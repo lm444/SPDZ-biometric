@@ -97,11 +97,11 @@ int recvFrom(int from, void* buf, int size, int flags) {                // if si
 
 // Application-specific methods
 
-void sendIntShare(int share, int to) {
+void sendInt(int share, int to) {
     sendTo(to, &share, sizeof(int), 0);
 }
 
-int recvIntShare(int from) {
+int recvInt(int from) {
     int res;
     recvFrom(from, &res, sizeof(int), 0);
     return res;
@@ -110,9 +110,9 @@ int recvIntShare(int from) {
 // Detached from the generic sendIntShare to simplify modification
 // for a different representation of the MAC key (e.g. uint64)
 void sendMACkeyShare(int MACkeyShare, int to) {
-    sendIntShare(MACkeyShare, to);
+    sendInt(MACkeyShare, to);
 }
 
 int recvMACkeyShare(int from) {
-    return recvIntShare(from);
+    return recvInt(from);
 }

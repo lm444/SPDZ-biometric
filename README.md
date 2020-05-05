@@ -14,3 +14,4 @@ It is mandatory to run them in the following order:
 In the following links there will be additional resources:
 - [Documentation](https://docs.google.com/document/d/1Ot9xtwCZHZKuxxdobcQ-d9KGzeHg5NgLcbT9VEKzXCw) (in italian)
 - [Valgrind Logs](https://drive.google.com/open?id=1wc-314hY08XFIxt-Wy1_6Git62UBIA2P)
+- [Output Logs](https://drive.google.com/open?id=1160kQMSFxATaASdUsCVzuDTpn1SKiijS)
