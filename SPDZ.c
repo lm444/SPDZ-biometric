@@ -73,3 +73,22 @@ void spdz_hammingDist(Iris* iris1, Iris* iris2, MultTripleArray* triples, int se
 
     printf("[SPDZ_HD_%d] num: %d; den: %d\n", self, num, den);
 }
+
+// Dealer will check the result by summing the ro_i values.
+void spdz_MACCheck(OpenValArray* openValues, RandArray* randValues, int key, int dealer) {
+    int i;
+    int a=0, gamma_i=0, ro_i;
+
+    int numVals   = openValues->nextFree;
+    int* openVals = openValues->values;
+    int* randVals = randValues->values;
+    
+    printf("Batch checking all %d open values.\n", numVals);
+    for (i=0; i<numVals; i++) a+=openVals[i]*randVals[i];
+    for (i=0; i<numVals; i++) {
+        int gamma_aj_i = key*openVals[i];         // TODO: check
+        gamma_i       += gamma_aj_i*randVals[i];
+    }
+    ro_i = gamma_i - a*key;
+    printf("Broadcasting ro (%d).\n", ro_i);
+}

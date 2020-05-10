@@ -2,7 +2,7 @@
 #include "Communication.h"
 #include "MultTriple.h"
 
-#define MAXVAL_MAC 100000
+#define MAXVAL_MAC 10
 
 /* Every share will be structured in an array of two fields
    arr[0] will be related to the Server

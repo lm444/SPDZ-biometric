@@ -115,7 +115,7 @@ int main(int argc, char** argv) {
 	printf("[SERVER] Received MACkeyShare: %d\n", MACkeyShare);
 
 	MultTripleShares=tripleArray_recv(dealer_desc);
-	printf("[SERVER] Received %d multiplicative triple sharesm %d free space.\n", MAX_TRIPLES, MultTripleShares->freeSpace);
+	printf("[SERVER] Received %d multiplicative triple shares, %d free space.\n", MAX_TRIPLES, MultTripleShares->freeSpace);
 
 	seed=recvInt(dealer_desc);
 	printf("[SERVER] Received seed %d.\n", seed);
@@ -138,6 +138,7 @@ int main(int argc, char** argv) {
 	else protocol();
 
 	openValArray_print(openValArray);
+	spdz_MACCheck(openValArray, randArray, MACkeyShare, dealer_desc);
 
 	openValArray_destroy(openValArray);
 	randArray_destroy(randArray);

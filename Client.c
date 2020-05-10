@@ -108,6 +108,7 @@ int main(int argc, char** argv) {
 	else protocol();
 
 	openValArray_print(openValArray);
+	spdz_MACCheck(openValArray, randArray, MACkeyShare, dealer_desc);
 
 	openValArray_destroy(openValArray);
 	randArray_destroy(randArray);
