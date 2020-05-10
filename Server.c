@@ -3,12 +3,12 @@
 #include "Communication.h"
 #include "SPDZ.h"
 #include "Debug.h"
-#include "MultTriple.h"
+#include "TripleArray.h"
 #include "RandArray.h"
 #include "OpenValArray.h"
 
 int MACkeyShare;
-MultTripleArray* MultTripleShares;
+TripleArray* tripleArray;
 int seed;
 RandArray* randArray;
 OpenValArray* openValArray;
@@ -78,7 +78,7 @@ void testSPDZ() {
 	}
 
 	debug_hammingDistClear(serverIrisClear, clientIrisClear);
-	spdz_hammingDist(serverIris, clientOtherShares, MultTripleShares, SERVER, client_desc, openValArray);
+	spdz_hammingDist(serverIris, clientOtherShares, tripleArray, SERVER, client_desc, openValArray);
 
 	
 	iris_destroy(serverIrisClear);
@@ -97,7 +97,7 @@ void protocol() {
 
 	Iris* clientIris = iris_recv(client_desc);
 
-	spdz_hammingDist(serverIris, clientIris, MultTripleShares, SERVER, client_desc, openValArray);
+	spdz_hammingDist(serverIris, clientIris, tripleArray, SERVER, client_desc, openValArray);
 
 	iris_destroy(serverIrisClear);
 	destroyShares(shares); 	      // will also destroy serverIris!
@@ -114,21 +114,21 @@ int main(int argc, char** argv) {
 	MACkeyShare=recvMACkeyShare(dealer_desc);
 	printf("[SERVER] Received MACkeyShare: %d\n", MACkeyShare);
 
-	MultTripleShares=tripleArray_recv(dealer_desc);
-	printf("[SERVER] Received %d multiplicative triple shares, %d free space.\n", MAX_TRIPLES, MultTripleShares->freeSpace);
+	tripleArray=tripleArray_recv(dealer_desc);
+	printf("[SERVER] Received %d multiplicative triple shares, %d free space.\n", MAX_TRIPLES, tripleArray->freeSpace);
 
 	seed=recvInt(dealer_desc);
 	printf("[SERVER] Received seed %d.\n", seed);
 
-	randArray=randArray_create(MultTripleShares->size);
+	randArray=randArray_create(tripleArray->size);
 	randArray_populate(randArray, seed);
 	randArray_print(randArray);
 	printf("[SERVER] Generated random values for the MAC check.\n");
 
-	openValArray=openValArray_create(MultTripleShares->size);
+	openValArray=openValArray_create(tripleArray->size);
 	printf("[SERVER] Initialized the open values structure.\n");
 
-	if (VERBOSE) tripleArray_print(MultTripleShares);
+	if (VERBOSE) tripleArray_print(tripleArray);
 	
 	// if (DEBUG) testServerFunctionalities();
 	if (CONVERTER) shrinkIrisFile("irisServer_raw.txt", IRIS_SERVER);
@@ -142,7 +142,7 @@ int main(int argc, char** argv) {
 
 	openValArray_destroy(openValArray);
 	randArray_destroy(randArray);
-	tripleArray_destroy(MultTripleShares);
+	tripleArray_destroy(tripleArray);
 
 	close(socket_desc);
 	close(client_desc);

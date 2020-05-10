@@ -1,6 +1,6 @@
 #include "Common.h"
 #include "Communication.h"
-#include "MultTriple.h"
+#include "TripleArray.h"
 
 #define MAXVAL_MAC 10
 
@@ -9,14 +9,14 @@
    arr[1] will be related to the Client */
 
 int MACkeyShares[2];
-MultTripleArray** MultTripleShares;
+TripleArray** TripleShares;
 
 int main() {
     // Offline phase: will generate triples shares and MAC key shares before connections
     int ret;
 
     printf("[TRUSTED DEALER] Will now generate %d multiplicative triples...\n", MAX_TRIPLES);
-    MultTripleShares = generateTriples(MAX_TRIPLES);
+    TripleShares = generateTriples(MAX_TRIPLES);
     printf("[TRUSTED DEALER] Multiplicative triples generated.\n");
 
     int MAC = rand()%MAXVAL_MAC;
@@ -40,9 +40,9 @@ int main() {
     printf("[TRUSTED DEALER] Sent MAC key shares: Server -> %d, Client -> %d.\n", MACkeyShares[SERVER], MACkeyShares[CLIENT]);
 
     printf("[TRUSTED DEALER] Sending now multiplicative triples key shares...\n");
-    ret=tripleArray_send(MultTripleShares[SERVER], MAX_TRIPLES, server_desc);
+    ret=tripleArray_send(TripleShares[SERVER], MAX_TRIPLES, server_desc);
     printf("[TRUSTED DEALER] Sent %d multiplicative triples to Server.\n", ret);
-    ret=tripleArray_send(MultTripleShares[CLIENT], MAX_TRIPLES, client_desc);
+    ret=tripleArray_send(TripleShares[CLIENT], MAX_TRIPLES, client_desc);
     printf("[TRUSTED DEALER] Sent %d multiplicative triples to Client.\n", ret);
 
     // Client and Server has to generate the same random vector.
@@ -51,9 +51,9 @@ int main() {
     sendInt(seed, server_desc);
     sendInt(seed, client_desc);
     
-    tripleArray_destroy(MultTripleShares[SERVER]);
-    tripleArray_destroy(MultTripleShares[CLIENT]);
-    free(MultTripleShares);
+    tripleArray_destroy(TripleShares[SERVER]);
+    tripleArray_destroy(TripleShares[CLIENT]);
+    free(TripleShares);
 
     close(socket_desc);
     close(server_desc);

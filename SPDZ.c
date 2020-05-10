@@ -7,11 +7,11 @@
 // Could guard against it, but complexity would increase
 
 int T=0; // temporary global variable for debugs
-int spdz_mult(int x, int y, MultTripleArray* triples, int self, int other, OpenValArray* openValues) {
+int spdz_mult(int x, int y, TripleArray* triples, int self, int other, OpenValArray* openValues) {
     int epsilonShare, deltaShare; // known
     int epsilon, delta;           // each party will know them after communication
 
-    MultTriple* currTriple = tripleArray_consume(triples, 1);
+    Triple* currTriple = tripleArray_consume(triples, 1);
 
     int a = currTriple->a;
     int b = currTriple->b;
@@ -41,7 +41,7 @@ int spdz_mult(int x, int y, MultTripleArray* triples, int self, int other, OpenV
         return c + b*epsilon + a*delta;
 }
 
-void spdz_hammingDist(Iris* iris1, Iris* iris2, MultTripleArray* triples, int self, int other, OpenValArray* openValues) {
+void spdz_hammingDist(Iris* iris1, Iris* iris2, TripleArray* triples, int self, int other, OpenValArray* openValues) {
     if (iris1->size!=iris2->size) {
         printf("Mismatching iris sizes. Skipping check.\n");
         return;

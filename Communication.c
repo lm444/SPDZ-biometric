@@ -1,5 +1,4 @@
 #include "Common.h"
-#include "MultTriple.h"
 
 // Connection primitives; wrappers
 
