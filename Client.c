@@ -48,6 +48,17 @@ void testSPDZ() {
 
 	client = party_create(CLIENT, MACkeyShare, server_desc, tripleArray, randArray, openValArray);
 
+	printf("[CLIENT] Printing server iris before MAC is populated...\n");
+	iris_print(serverOtherShares);
+	spdz_genIrisMACShares(serverOtherShares, client);
+	printf("[CLIENT] Printing server iris after MAC is populated...\n");
+	iris_print(serverOtherShares);
+	printf("[CLIENT] Printing client iris before MAC is populated...\n");
+	iris_print(clientIris);
+	spdz_genIrisMACShares(clientIris, client);
+	printf("[CLIENT] Printing client iris after MAC is populated...\n");
+	iris_print(clientIris);
+
 	debug_hammingDistClear(clientIrisClear, serverIrisClear);
 	spdz_hammingDist(serverOtherShares, clientIris, client);
 

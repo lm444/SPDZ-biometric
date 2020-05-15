@@ -3,11 +3,13 @@
 #include "Communication.h"
 
 Iris* iris_create(int size) {
-	Iris* res = (Iris*) malloc(sizeof(Iris));
+	Iris* res 	  	  = (Iris*) malloc(sizeof(Iris));
 
-	res->size 	  = size;
-	res->iriscode = (int*) malloc(res->size*sizeof(int));
-	res->mask     = (int*) malloc(res->size*sizeof(int));
+	res->size 	      = size;
+	res->iriscode     = (int*) malloc(res->size*sizeof(int));
+	res->MAC_iriscode = (int*) calloc(size,sizeof(int));
+	res->mask         = (int*) malloc(res->size*sizeof(int));
+	res->MAC_mask     = (int*) calloc(size,sizeof(int));
 
 	if (VERBOSE) printf("New iris of size %d at %p.\n", res->size, res);
 	return res;
@@ -57,11 +59,17 @@ Iris* iris_read(const char* inputFile) {
 
 void iris_print(Iris* iris) {
     int i;
+	int maxprint=DEBUG_PRINTELEMS;
+	if (VERBOSE==2) maxprint=iris->size;
 	printf("Printing iris %p\n", iris);
-	printf("iriscode: ");
-	for (i=0; i<iris->size; i++) printf("%d", iris->iriscode[i]);
-	printf("\nmask: ");
-	for (i=0; i<iris->size; i++) printf("%d", iris->mask[i]);
+	for (i=0; i<maxprint; i++) {
+		printf("Iriscode[%d]=%d\n", i, iris->iriscode[i]);
+		printf("MAC_Iriscode[%d]=%d\n", i, iris->MAC_iriscode[i]);
+	}	
+	for (i=0; i<maxprint; i++) {
+		printf("Irismask[%d]=%d\n", i, iris->mask[i]);
+		printf("MAC_Irismask[%d]=%d\n", i, iris->MAC_mask[i]);
+	}
 	printf("\n");
 }
 

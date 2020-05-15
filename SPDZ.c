@@ -51,6 +51,17 @@ int spdz_mult(int x, int y, Party* party, int mode) {
         return c + b*epsilon + a*delta;
 }
 
+// Populate the iris' MAC fields
+// NOTE: iris is the share of an iris. 
+// Also, it will require communication.
+void spdz_genIrisMACShares(Iris* iris, Party* party) {
+    int i;
+    for (i=0; i<iris->size; i++) {
+        iris->MAC_iriscode[i] = spdz_mult(iris->iriscode[i], party->MACkey, party, SAVE_OPEN_NO);
+        iris->MAC_mask[i]     = spdz_mult(iris->mask[i], party->MACkey, party, SAVE_OPEN_NO);
+    }
+}
+
 void spdz_hammingDist(Iris* iris1, Iris* iris2, Party* party) {
     if (iris1->size!=iris2->size) {
         printf("Mismatching iris sizes. Skipping check.\n");

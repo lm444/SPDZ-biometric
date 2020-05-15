@@ -4,7 +4,9 @@
 // Iris size is here defined as length of the iriscode (which is the same as the mask).
 typedef struct Iris {
 	int* iriscode;
+	int* MAC_iriscode;
 	int* mask;
+	int* MAC_mask;
 	int size;
 } Iris;
 
