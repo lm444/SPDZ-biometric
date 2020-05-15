@@ -7,7 +7,13 @@
 // Could guard against it, but complexity would increase
 
 int T; // temporary global variable for debugs
-int spdz_mult(int x, int y, TripleArray* triples, int self, int other, OpenValArray* openValues) {
+
+#define SAVE_OPEN_NO  0
+#define SAVE_OPEN_YES 1
+
+// mode: SAVE_OPEN_NO  -> will NOT save open values
+// mode: SAVE_OPEN_YES -> will save open values
+int spdz_mult(int x, int y, TripleArray* triples, int self, int other, OpenValArray* openValues, int mode) {
     int epsilonShare, deltaShare; // known
     int epsilon, delta;           // each party will know them after communication
 
@@ -25,8 +31,10 @@ int spdz_mult(int x, int y, TripleArray* triples, int self, int other, OpenValAr
     epsilon = epsilonShare + recvInt(other);
     delta   = deltaShare   + recvInt(other);
 
-    openValArray_insert(openValues, epsilon);
-    openValArray_insert(openValues, delta);
+    if (mode==SAVE_OPEN_YES) {
+        openValArray_insert(openValues, epsilon, 123123123); // temp magic numbers for checks
+        openValArray_insert(openValues, delta, 234234234);
+    }
 
     if (T<10) {
         printf("Check input: %d, %d\n", x, y);
@@ -62,12 +70,12 @@ void spdz_hammingDist(Iris* iris1, Iris* iris2, TripleArray* triples, int self, 
         int m1 = iris1->mask[i];
         int m2 = iris2->mask[i];
         // num += (f1+f2-2*f1*f2)*(1-(m1+m2-m1*m2));
-        int f1f2 = (spdz_mult(f1, f2, triples, self, other, openValues));
-        int m1m2 = (spdz_mult(m1, m2, triples, self, other, openValues));
+        int f1f2 = spdz_mult(f1, f2, triples, self, other, openValues, SAVE_OPEN_YES);
+        int m1m2 = spdz_mult(m1, m2, triples, self, other, openValues, SAVE_OPEN_YES);
 
         int num1 = f1+f2-2*f1f2;
         int temp = -(m1+m2-m1m2);
-        int num2 = spdz_mult(num1, temp, triples, self, other, openValues);
+        int num2 = spdz_mult(num1, temp, triples, self, other, openValues, SAVE_OPEN_YES);
 
         num += num1+num2;
         den -= (m1+m2-m1m2);
