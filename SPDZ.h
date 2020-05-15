@@ -7,7 +7,6 @@
 #include "RandArray.h"
 #include "Party.h"
 
-int spdz_mult(int x, int y, Party* party, int mode);
 void spdz_genIrisMACShares(Iris* iris, Party* party);
 void spdz_hammingDist(Iris* iris1, Iris* iris2, Party* party);
 void spdz_MACCheck(OpenValArray* openValues, RandArray* randValues, int key, int dealer);

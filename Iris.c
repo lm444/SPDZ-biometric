@@ -77,6 +77,8 @@ void iris_destroy(Iris* iris) {
 	if (VERBOSE) printf("Freeing iris %p\n", iris);
 	free(iris->iriscode);
 	free(iris->mask);
+	free(iris->MAC_iriscode);
+	free(iris->MAC_mask);
 	free(iris);
 }
 
