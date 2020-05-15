@@ -45,5 +45,6 @@ void openValArray_print(OpenValArray* arr) {
 
 void openValArray_destroy(OpenValArray* arr) {
     free(arr->values);
+    free(arr->MAC_values);
     free(arr);
 }

@@ -1,5 +1,5 @@
-srcClient = Client.c Common.c Iris.c Communication.c SPDZ.c Debug.c TripleArray.c RandArray.c OpenValArray.c
-srcServer = Server.c Common.c Iris.c Communication.c SPDZ.c Debug.c TripleArray.c RandArray.c OpenValArray.c
+srcClient = Client.c Common.c Iris.c Communication.c SPDZ.c Debug.c TripleArray.c RandArray.c OpenValArray.c Party.c
+srcServer = Server.c Common.c Iris.c Communication.c SPDZ.c Debug.c TripleArray.c RandArray.c OpenValArray.c Party.c
 srcDealer = TrustedDealer.c Common.c Communication.c TripleArray.c 
 
 binPath = ./bin/

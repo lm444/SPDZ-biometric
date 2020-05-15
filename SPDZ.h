@@ -5,8 +5,9 @@
 #include "TripleArray.h"
 #include "OpenValArray.h"
 #include "RandArray.h"
+#include "Party.h"
 
-void spdz_hammingDist(Iris* iris1, Iris* iris2, TripleArray* triples, int self, int other, OpenValArray* openValues);
+void spdz_hammingDist(Iris* iris1, Iris* iris2, Party* party);
 void spdz_MACCheck(OpenValArray* openValues, RandArray* randValues, int key, int dealer);
 
 #endif

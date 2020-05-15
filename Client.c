@@ -6,12 +6,14 @@
 #include "TripleArray.h"
 #include "RandArray.h"
 #include "OpenValArray.h"
+#include "Party.h"
 
 int MACkeyShare;
 TripleArray* tripleArray;
 int seed;
 RandArray* randArray;
 OpenValArray* openValArray;
+Party* client;
 
 int server_desc, dealer_desc;
 
@@ -44,8 +46,10 @@ void testSPDZ() {
 		assert(serverOtherShares->mask[i]+serverSelfShares->mask[i]==serverIrisClear->mask[i]);
 	}
 
+	client = party_create(CLIENT, MACkeyShare, server_desc, tripleArray, randArray, openValArray);
+
 	debug_hammingDistClear(clientIrisClear, serverIrisClear);
-	spdz_hammingDist(serverOtherShares, clientIris, tripleArray, CLIENT, server_desc, openValArray);
+	spdz_hammingDist(serverOtherShares, clientIris, client);
 
 	iris_destroy(clientIrisClear);
 	iris_destroy(serverIrisClear); 
@@ -66,8 +70,8 @@ void protocol() {
 	iris_send(shares[1], server_desc);
 
 	Iris* serverIris = iris_recv(server_desc);
-
-	spdz_hammingDist(serverIris, clientIris, tripleArray, CLIENT, server_desc, openValArray);
+	client = party_create(CLIENT, MACkeyShare, server_desc, tripleArray, randArray, openValArray);
+	spdz_hammingDist(serverIris, clientIris, client);
 
 	iris_destroy(clientIrisClear);
 	destroyShares(shares); 	      // will also destroy clientIris!
@@ -110,9 +114,7 @@ int main(int argc, char** argv) {
 	if (VERBOSE) openValArray_print(openValArray);
 	spdz_MACCheck(openValArray, randArray, MACkeyShare, dealer_desc);
 
-	openValArray_destroy(openValArray);
-	randArray_destroy(randArray);
-	tripleArray_destroy(tripleArray);
+	party_destroy(client);
 
 	close(server_desc);
 	close(dealer_desc);

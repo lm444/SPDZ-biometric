@@ -39,7 +39,7 @@ int main() {
     printf("[TRUSTED DEALER] Sending now MAC key shares...\n");
     sendMACkeyShare(MACkeyShares[SERVER], server_desc);
     sendMACkeyShare(MACkeyShares[CLIENT], client_desc);
-    printf("[TRUSTED DEALER] Sent MAC key shares");
+    printf("[TRUSTED DEALER] Sent MAC key shares.\n");
 
     printf("[TRUSTED DEALER] Sending now multiplicative triples key shares...\n");
     ret=tripleArray_send(TripleShares[SERVER], MAX_TRIPLES, server_desc);

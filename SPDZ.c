@@ -2,6 +2,7 @@
 #include "Common.h"
 #include "Communication.h"
 #include "Iris.h"
+#include "Party.h"
 
 // Assumption: Everyone follows the protocol taking triples in order from their list.
 // Could guard against it, but complexity would increase
@@ -13,11 +14,11 @@ int T; // temporary global variable for debugs
 
 // mode: SAVE_OPEN_NO  -> will NOT save open values
 // mode: SAVE_OPEN_YES -> will save open values
-int spdz_mult(int x, int y, TripleArray* triples, int self, int other, OpenValArray* openValues, int mode) {
+int spdz_mult(int x, int y, Party* party, int mode) {
     int epsilonShare, deltaShare; // known
     int epsilon, delta;           // each party will know them after communication
 
-    Triple* currTriple = tripleArray_consume(triples, 1);
+    Triple* currTriple = tripleArray_consume(party->tripleArray, 1);
 
     int a = currTriple->a;
     int b = currTriple->b;
@@ -26,14 +27,14 @@ int spdz_mult(int x, int y, TripleArray* triples, int self, int other, OpenValAr
     epsilonShare = x-a; // gamma(x)_0 - gamma(a)_0
     deltaShare   = y-b; // 
     
-    sendInt(epsilonShare, other);
-    sendInt(deltaShare, other);
-    epsilon = epsilonShare + recvInt(other);
-    delta   = deltaShare   + recvInt(other);
+    sendInt(epsilonShare, party->peer);
+    sendInt(deltaShare, party->peer);
+    epsilon = epsilonShare + recvInt(party->peer);
+    delta   = deltaShare   + recvInt(party->peer);
 
     if (mode==SAVE_OPEN_YES) {
-        openValArray_insert(openValues, epsilon, 123123123); // temp magic numbers for checks
-        openValArray_insert(openValues, delta, 234234234);
+        openValArray_insert(party->openValArray, epsilon, 123123123); // temp magic numbers for checks
+        openValArray_insert(party->openValArray, delta, 234234234);
     }
 
     if (T<10) {
@@ -44,13 +45,13 @@ int spdz_mult(int x, int y, TripleArray* triples, int self, int other, OpenValAr
         T++;
     }
 
-    if (self==SERVER) 
+    if (party->ID==SERVER) 
         return c + b*epsilon + a*delta + epsilon*delta;
     else   
         return c + b*epsilon + a*delta;
 }
 
-void spdz_hammingDist(Iris* iris1, Iris* iris2, TripleArray* triples, int self, int other, OpenValArray* openValues) {
+void spdz_hammingDist(Iris* iris1, Iris* iris2, Party* party) {
     if (iris1->size!=iris2->size) {
         printf("Mismatching iris sizes. Skipping check.\n");
         return;
@@ -61,7 +62,7 @@ void spdz_hammingDist(Iris* iris1, Iris* iris2, TripleArray* triples, int self, 
     // Hamming distance
     int i;
     int num=0, den;
-    if (self==SERVER) den=iris1->size;
+    if (party->ID==SERVER) den=iris1->size;
     else den=0;
 
     for (i=0; i<iris1->size; i++) {
@@ -70,18 +71,18 @@ void spdz_hammingDist(Iris* iris1, Iris* iris2, TripleArray* triples, int self, 
         int m1 = iris1->mask[i];
         int m2 = iris2->mask[i];
         // num += (f1+f2-2*f1*f2)*(1-(m1+m2-m1*m2));
-        int f1f2 = spdz_mult(f1, f2, triples, self, other, openValues, SAVE_OPEN_YES);
-        int m1m2 = spdz_mult(m1, m2, triples, self, other, openValues, SAVE_OPEN_YES);
+        int f1f2 = spdz_mult(f1, f2, party, SAVE_OPEN_YES);
+        int m1m2 = spdz_mult(m1, m2, party, SAVE_OPEN_YES);
 
         int num1 = f1+f2-2*f1f2;
         int temp = -(m1+m2-m1m2);
-        int num2 = spdz_mult(num1, temp, triples, self, other, openValues, SAVE_OPEN_YES);
+        int num2 = spdz_mult(num1, temp, party, SAVE_OPEN_YES);
 
         num += num1+num2;
         den -= (m1+m2-m1m2);
     }
 
-    printf("[SPDZ_HD_%d] num: %d; den: %d\n", self, num, den);
+    printf("[SPDZ_HD_%d] num: %d; den: %d\n", party->ID, num, den);
 }
 
 // Dealer will check the result by summing the ro_i values.
