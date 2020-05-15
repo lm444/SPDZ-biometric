@@ -1,4 +1,4 @@
-#include "Common.h"
+#include "../Common.h"
 #include "RandArray.h"
 
 RandArray* randArray_create(int size) {

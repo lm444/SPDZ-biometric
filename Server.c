@@ -1,11 +1,11 @@
 #include "Common.h"
-#include "Iris.h"
 #include "Communication.h"
 #include "SPDZ.h"
 #include "Debug.h"
-#include "TripleArray.h"
-#include "RandArray.h"
-#include "OpenValArray.h"
+#include "./structures/Iris.h"
+#include "./structures/TripleArray.h"
+#include "./structures/RandArray.h"
+#include "./structures/OpenValArray.h"
 #include "Party.h"
 
 int MACkeyShare;

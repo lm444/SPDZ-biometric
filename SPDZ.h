@@ -1,10 +1,10 @@
 #ifndef SPDZ_H_
 #define SPDZ_H_
 
-#include "Iris.h"
-#include "TripleArray.h"
-#include "OpenValArray.h"
-#include "RandArray.h"
+#include "./structures/Iris.h"
+#include "./structures/TripleArray.h"
+#include "./structures/OpenValArray.h"
+#include "./structures/RandArray.h"
 #include "Party.h"
 
 void spdz_genIrisMACShares(Iris* iris, Party* party);

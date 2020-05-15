@@ -1,6 +1,6 @@
 #include "Common.h"
 #include "Communication.h"
-#include "TripleArray.h"
+#include "./structures/TripleArray.h"
 
 #define MAXVAL_MAC 10
 

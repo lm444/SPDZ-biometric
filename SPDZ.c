@@ -1,7 +1,7 @@
 #include "SPDZ.h"
 #include "Common.h"
 #include "Communication.h"
-#include "Iris.h"
+#include "./structures/Iris.h"
 #include "Party.h"
 
 // Assumption: Everyone follows the protocol taking triples in order from their list.

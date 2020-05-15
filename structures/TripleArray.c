@@ -1,6 +1,6 @@
 #include "TripleArray.h"
-#include "Communication.h"
-#include "Common.h"
+#include "../Communication.h"
+#include "../Common.h"
 
 #define TRIPLE_MAX_VAL 10
 

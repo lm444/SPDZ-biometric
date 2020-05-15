@@ -1,6 +1,6 @@
 #include "Iris.h"
-#include "Common.h"
-#include "Communication.h"
+#include "../Common.h"
+#include "../Communication.h"
 
 Iris* iris_create(int size) {
 	Iris* res 	  	  = (Iris*) malloc(sizeof(Iris));

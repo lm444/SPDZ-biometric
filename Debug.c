@@ -3,7 +3,7 @@
 // Will be a lot verbose 
 
 #include "Common.h"
-#include "Iris.h"
+#include "Debug.h"
 
 void debug_hammingDistClear(Iris* iris1, Iris* iris2) {
     if (iris1->size!=iris2->size) {

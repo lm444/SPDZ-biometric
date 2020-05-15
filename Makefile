@@ -1,6 +1,13 @@
-srcClient = Client.c Common.c Iris.c Communication.c SPDZ.c Debug.c TripleArray.c RandArray.c OpenValArray.c Party.c
-srcServer = Server.c Common.c Iris.c Communication.c SPDZ.c Debug.c TripleArray.c RandArray.c OpenValArray.c Party.c
-srcDealer = TrustedDealer.c Common.c Communication.c TripleArray.c 
+structuresPath = ./structures/
+
+structuresClient = *.c
+structuresServer = *.c
+structuresDealer = TripleArray.c 
+
+srcClient = Client.c Common.c Communication.c SPDZ.c Debug.c Party.c $(structuresPath)$(structuresClient)
+srcServer = Server.c Common.c Communication.c SPDZ.c Debug.c Party.c $(structuresPath)$(structuresServer)
+srcDealer = TrustedDealer.c Common.c Communication.c $(structuresPath)$(structuresDealer)
+
 
 binPath = ./bin/
 binClient = client

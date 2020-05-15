@@ -1,9 +1,9 @@
 #ifndef PARTY_H_
 #define PARTY_H_
 
-#include "OpenValArray.h"
-#include "RandArray.h"
-#include "TripleArray.h"
+#include "./structures/OpenValArray.h"
+#include "./structures/RandArray.h"
+#include "./structures/TripleArray.h"
 #include "Common.h"
 
 typedef struct Party {
