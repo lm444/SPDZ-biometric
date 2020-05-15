@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
 
 	randArray=randArray_create(tripleArray->size);
 	randArray_populate(randArray, seed);
-	randArray_print(randArray);
+	if (VERBOSE) randArray_print(randArray);
 	printf("[CLIENT] Generated random values for the MAC check.\n");
 
 	openValArray=openValArray_create(tripleArray->size);
@@ -107,7 +107,7 @@ int main(int argc, char** argv) {
 	if (DEBUG) testSPDZ();
 	else protocol();
 
-	openValArray_print(openValArray);
+	if (VERBOSE) openValArray_print(openValArray);
 	spdz_MACCheck(openValArray, randArray, MACkeyShare, dealer_desc);
 
 	openValArray_destroy(openValArray);

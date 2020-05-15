@@ -6,7 +6,7 @@
 // Assumption: Everyone follows the protocol taking triples in order from their list.
 // Could guard against it, but complexity would increase
 
-int T=0; // temporary global variable for debugs
+int T; // temporary global variable for debugs
 int spdz_mult(int x, int y, TripleArray* triples, int self, int other, OpenValArray* openValues) {
     int epsilonShare, deltaShare; // known
     int epsilon, delta;           // each party will know them after communication
@@ -17,8 +17,8 @@ int spdz_mult(int x, int y, TripleArray* triples, int self, int other, OpenValAr
     int b = currTriple->b;
     int c = currTriple->c;
 
-    epsilonShare = x-a;
-    deltaShare   = y-b;
+    epsilonShare = x-a; // gamma(x)_0 - gamma(a)_0
+    deltaShare   = y-b; // 
     
     sendInt(epsilonShare, other);
     sendInt(deltaShare, other);
@@ -33,6 +33,7 @@ int spdz_mult(int x, int y, TripleArray* triples, int self, int other, OpenValAr
         printf("Check tripleShare: %d, %d, %d\n", a, b, c);
         printf("Check epsilon-delta: %d, %d\n", epsilon, delta);
         printf("Check output (without +e-d): %d\n", c + b*epsilon + a*delta);
+        T++;
     }
 
     if (self==SERVER) 
@@ -46,6 +47,8 @@ void spdz_hammingDist(Iris* iris1, Iris* iris2, TripleArray* triples, int self, 
         printf("Mismatching iris sizes. Skipping check.\n");
         return;
     }
+    if (VERBOSE) T=0;
+    else T=10;
 
     // Hamming distance
     int i;
@@ -68,7 +71,6 @@ void spdz_hammingDist(Iris* iris1, Iris* iris2, TripleArray* triples, int self, 
 
         num += num1+num2;
         den -= (m1+m2-m1m2);
-        T++;
     }
 
     printf("[SPDZ_HD_%d] num: %d; den: %d\n", self, num, den);

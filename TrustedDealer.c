@@ -15,15 +15,17 @@ int main() {
     // Offline phase: will generate triples shares and MAC key shares before connections
     int ret;
 
+    int MACKey = rand()%MAXVAL_MAC;
+    printf("[TRUSTED DEALER] Generated MAC key: %d.\n", MACKey);
+    MACkeyShares[SERVER] = (MACKey-(rand()-RAND_MAX/2))%MAXVAL_MAC;
+    MACkeyShares[CLIENT] = MACKey-MACkeyShares[SERVER];
+    assert(MACkeyShares[SERVER]+MACkeyShares[CLIENT]==MACKey);
+    printf("[TRUSTED DEALER] Generated MAC shares: %d, %d.\n", MACkeyShares[SERVER], MACkeyShares[CLIENT]);
+
     printf("[TRUSTED DEALER] Will now generate %d multiplicative triples...\n", MAX_TRIPLES);
-    TripleShares = generateTriples(MAX_TRIPLES);
+    TripleShares = generateTriples(MAX_TRIPLES, MACKey);
     printf("[TRUSTED DEALER] Multiplicative triples generated.\n");
 
-    int MAC = rand()%MAXVAL_MAC;
-    MACkeyShares[SERVER] = (MAC-(rand()-RAND_MAX/2))%MAXVAL_MAC;
-    MACkeyShares[CLIENT] = MAC-MACkeyShares[SERVER];
-    assert(MACkeyShares[SERVER]+MACkeyShares[CLIENT]==MAC);
-    printf("[TRUSTED DEALER] MAC shares generated.\n");
 
     // TD will have a connection with both the Server and the Client.
     // IMPORTANT: it is mandatory to run Dealer -> Server -> Client
@@ -37,7 +39,7 @@ int main() {
     printf("[TRUSTED DEALER] Sending now MAC key shares...\n");
     sendMACkeyShare(MACkeyShares[SERVER], server_desc);
     sendMACkeyShare(MACkeyShares[CLIENT], client_desc);
-    printf("[TRUSTED DEALER] Sent MAC key shares: Server -> %d, Client -> %d.\n", MACkeyShares[SERVER], MACkeyShares[CLIENT]);
+    printf("[TRUSTED DEALER] Sent MAC key shares");
 
     printf("[TRUSTED DEALER] Sending now multiplicative triples key shares...\n");
     ret=tripleArray_send(TripleShares[SERVER], MAX_TRIPLES, server_desc);

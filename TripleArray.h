@@ -5,8 +5,11 @@
 
 typedef struct Triple {
     int a;
+    int MAC_a;
     int b;
+    int MAC_b;
     int c;
+    int MAC_c;
 } Triple;
 
 typedef struct TripleArray {
@@ -25,6 +28,6 @@ void tripleArray_print(TripleArray* arr);
 int tripleArray_send(TripleArray* arr, int numTriples, int to);
 TripleArray* tripleArray_recv(int from);
 
-TripleArray** generateTriples(int numTriples);
+TripleArray** generateTriples(int numTriples, int MACKey);
 
 #endif

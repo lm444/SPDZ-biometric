@@ -40,16 +40,19 @@ void tripleArray_print(TripleArray* arr) {
 
 	for (i=0; i<max; i++) {
 		printf("Triple[%d] = %d %d %d\n", i, triples[i].a, triples[i].b, triples[i].c);
+        printf("TripleMAC[%d] = %d %d %d\n", i, triples[i].MAC_a, triples[i].MAC_b, triples[i].MAC_c);
 		if (VERBOSE<2) {
             printf("Triple[%d] = %d %d %d\n", reverse, triples[reverse].a, triples[reverse].b, triples[reverse].c);
+            printf("TripleMAC[%d] = %d %d %d\n", reverse, triples[reverse].MAC_a, triples[reverse].MAC_b, triples[reverse].MAC_c);
             reverse--;
         }
 	}
 }
 
-TripleArray** generateTriples(int numTriples) {
+TripleArray** generateTriples(int numTriples, int MACKey) {
     int i;
     int randA, randB, randC;
+    int randMAC_a, randMAC_b, randMAC_c;
 
     TripleArray** res = (TripleArray**) malloc(2*sizeof(Triple*));
 
@@ -66,13 +69,25 @@ TripleArray** generateTriples(int numTriples) {
         randB = rand()%TRIPLE_MAX_VAL;
         randC = randA*randB;
 
-        serverShares[i].a = randA-rand()%TRIPLE_MAX_VAL;
-        serverShares[i].b = randB-rand()%TRIPLE_MAX_VAL;
-        serverShares[i].c = randC-rand()%(TRIPLE_MAX_VAL*TRIPLE_MAX_VAL);
+        randMAC_a = rand()%TRIPLE_MAX_VAL;
+        randMAC_b = rand()%TRIPLE_MAX_VAL;
+        randMAC_c = rand()%TRIPLE_MAX_VAL;
 
-        clientShares[i].a = randA-serverShares[i].a;
-        clientShares[i].b = randB-serverShares[i].b;
-        clientShares[i].c = randC-serverShares[i].c;
+        serverShares[i].a = randA - rand()%TRIPLE_MAX_VAL;
+        serverShares[i].b = randB - rand()%TRIPLE_MAX_VAL;
+        serverShares[i].c = randC - rand()%(TRIPLE_MAX_VAL*TRIPLE_MAX_VAL);
+
+        clientShares[i].a = randA - serverShares[i].a;
+        clientShares[i].b = randB - serverShares[i].b;
+        clientShares[i].c = randC - serverShares[i].c;
+
+        serverShares[i].MAC_a = (serverShares[i].a+clientShares[i].a)*MACKey - randMAC_a;
+        serverShares[i].MAC_b = (serverShares[i].b+clientShares[i].b)*MACKey - randMAC_b;
+        serverShares[i].MAC_c = (serverShares[i].c+clientShares[i].c)*MACKey - randMAC_c;
+
+        clientShares[i].MAC_a = randMAC_a;
+        clientShares[i].MAC_b = randMAC_b;
+        clientShares[i].MAC_c = randMAC_c;
     }
 
     // Generic checks over generation of triples or prints. 
@@ -80,14 +95,46 @@ TripleArray** generateTriples(int numTriples) {
     // Will not check by default since it would weigh down computation.
 
     if (DEBUG|VERBOSE) {
+        int printTriples;
+        if (VERBOSE==1) printTriples=DEBUG_PRINTELEMS;
+        else if (VERBOSE==2) printTriples=MAX_TRIPLES;
         for (i=0; i<MAX_TRIPLES; i++) {
-            if (VERBOSE==2) {
+            if (VERBOSE==1 && i<printTriples) {
                 printf("TripleShares[SERVER][%d] = %d, %d, %d", i, serverShares[i].a, serverShares[i].b, serverShares[i].c);
                 printf("\n");
+                printf("MAC[SERVER][%d] = %d, %d, %d", i, serverShares[i].MAC_a, serverShares[i].MAC_b, serverShares[i].MAC_c);
+                printf("\n");
                 printf("TripleShares[CLIENT][%d] = %d, %d, %d", i, clientShares[i].a, clientShares[i].b, clientShares[i].c);
+                printf("\n");
+                printf("MAC[CLIENT][%d] = %d, %d, %d", i, clientShares[i].MAC_a, clientShares[i].MAC_b, clientShares[i].MAC_c);
+                printf("\n");
+
             }
-            if (DEBUG) assert((serverShares[i].a+clientShares[i].a)*(serverShares[i].b+clientShares[i].b)==serverShares[i].c+clientShares[i].c);
-            if (VERBOSE==2) printf("\n");
+            else if (VERBOSE==2) {
+                printf("TripleShares[SERVER][%d] = %d, %d, %d", i, serverShares[i].a, serverShares[i].b, serverShares[i].c);
+                printf("\n");
+                printf("MAC[SERVER][%d] = %d, %d, %d", i, serverShares[i].MAC_a, serverShares[i].MAC_b, serverShares[i].MAC_c);
+                printf("\n");
+                printf("TripleShares[CLIENT][%d] = %d, %d, %d", i, clientShares[i].a, clientShares[i].b, clientShares[i].c);
+                printf("\n");
+                printf("MAC[CLIENT][%d] = %d, %d, %d", i, clientShares[i].MAC_a, clientShares[i].MAC_b, clientShares[i].MAC_c);
+                printf("\n");
+            }
+            if (DEBUG) {
+                int shared_a = serverShares[i].a+clientShares[i].a;
+                int shared_b = serverShares[i].b+clientShares[i].b;
+                int shared_c = serverShares[i].c+clientShares[i].c;
+                assert(shared_a*shared_b == shared_c);
+                int shared_MAC_a   = serverShares[i].a*MACKey + clientShares[i].a*MACKey;
+                int shared_MAC_b   = serverShares[i].b*MACKey + clientShares[i].b*MACKey;
+                int shared_MAC_c   = serverShares[i].c*MACKey + clientShares[i].c*MACKey;
+                int expected_MAC_a = shared_a*MACKey;
+                int expected_MAC_b = shared_b*MACKey;
+                int expected_MAC_c = shared_c*MACKey;
+                assert(shared_MAC_a == expected_MAC_a);
+                assert(shared_MAC_b == expected_MAC_b);
+                assert(shared_MAC_c == expected_MAC_c);
+            }
         }
     }
 
