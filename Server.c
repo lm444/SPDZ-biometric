@@ -7,6 +7,7 @@
 #include "./structures/RandArray.h"
 #include "./structures/OpenValArray.h"
 #include "Party.h"
+#include "HammingDist.h"
 
 int MACkeyShare;
 TripleArray* tripleArray;
@@ -92,10 +93,14 @@ void testSPDZ() {
 	printf("[SERVER] Printing server iris after MAC is populated...\n");
 	iris_print(clientOtherShares);
 
-	debug_hammingDistClear(serverIrisClear, clientIrisClear);
-	spdz_hammingDist(serverIris, clientOtherShares, server);
+	HammingDistance* hd_clear = debug_hammingDistClear(serverIrisClear, clientIrisClear);
+	hd_send(hd_clear, dealer_desc);
+	HammingDistance* hd_share = spdz_hammingDist(serverIris, clientOtherShares, server);
+	hd_send(hd_share, dealer_desc);
 
-	
+
+	hd_destroy(hd_clear);
+	hd_destroy(hd_share);
 	iris_destroy(serverIrisClear);
 	iris_destroy(clientIrisClear); // TEMP
 	destroyShares(shares); 	      // will also destroy serverIris!
@@ -114,7 +119,7 @@ void protocol() {
 
 	server = party_create(SERVER, MACkeyShare, client_desc, tripleArray, randArray, openValArray);
 	spdz_hammingDist(serverIris, clientIris, server);
-
+	
 	iris_destroy(serverIrisClear);
 	destroyShares(shares); 	      // will also destroy serverIris!
 	iris_destroy(clientIris);

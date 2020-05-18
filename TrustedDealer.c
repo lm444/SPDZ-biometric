@@ -1,6 +1,7 @@
 #include "Common.h"
 #include "Communication.h"
 #include "./structures/TripleArray.h"
+#include "HammingDist.h"
 
 #define MAXVAL_MAC 10
 
@@ -57,6 +58,36 @@ int main() {
     tripleArray_destroy(TripleShares[CLIENT]);
     free(TripleShares);
 
+    if (DEBUG) {
+        HammingDistance* hd_client_clear = hd_recv(client_desc);
+        HammingDistance* hd_server_clear = hd_recv(server_desc);
+        assert(hd_client_clear->num == hd_server_clear->num);
+        assert(hd_client_clear->den == hd_server_clear->den);
+        printf("[TRUSTED DEALER] Calculated HD in SPDZ: NUM %d | DEN %d\n", 
+                hd_client_clear->num, hd_client_clear->den);
+        hd_destroy(hd_client_clear);
+        hd_destroy(hd_server_clear);
+    }
+
+    HammingDistance* hd_client = hd_recv(client_desc);
+    HammingDistance* hd_server = hd_recv(server_desc);
+
+    printf("[TRUSTED DEALER] Calculated HD in SPDZ: NUM %d | DEN %d\n", 
+            hd_client->num+hd_server->num, hd_client->den+hd_server->den);
+
+    int sigma_client = recvInt(client_desc);
+    int sigma_server = recvInt(server_desc);
+
+    printf("[TRUSTED DEALER] Detected sigma sum: %d (0 = correct).\n", sigma_client+sigma_server);
+
+    if (sigma_client+sigma_server != 0) {
+        printf("[TRUSTED DEALER] ABORTING COMPUTATION: SOMEBODY CHEATED.\n");
+        exit(1);
+    }
+
+    hd_destroy(hd_client);
+    hd_destroy(hd_server);
+ 
     close(socket_desc);
     close(server_desc);
     close(client_desc);

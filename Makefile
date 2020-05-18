@@ -4,9 +4,9 @@ structuresClient = *.c
 structuresServer = *.c
 structuresDealer = TripleArray.c 
 
-srcClient = Client.c Common.c Communication.c SPDZ.c Debug.c Party.c $(structuresPath)$(structuresClient)
-srcServer = Server.c Common.c Communication.c SPDZ.c Debug.c Party.c $(structuresPath)$(structuresServer)
-srcDealer = TrustedDealer.c Common.c Communication.c $(structuresPath)$(structuresDealer)
+srcClient = Client.c Common.c Communication.c SPDZ.c Debug.c Party.c HammingDist.c $(structuresPath)$(structuresClient)
+srcServer = Server.c Common.c Communication.c SPDZ.c Debug.c Party.c HammingDist.c $(structuresPath)$(structuresServer)
+srcDealer = TrustedDealer.c Common.c Communication.c HammingDist.c $(structuresPath)$(structuresDealer)
 
 
 binPath = ./bin/

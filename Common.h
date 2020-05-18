@@ -13,6 +13,8 @@
 #include <errno.h>
 #include <assert.h>
 
+#include "Modulo.h"
+
 #define IRIS_CLIENT "irisClient.txt"
 #define IRIS_SERVER "irisServer.txt"
 
@@ -21,6 +23,8 @@
 
 #define THRESHOLD 0.25
 #define P_FIELD 7
+
+#define MODULE 17
 
 /* Different levels of VERBOSE:
    1 - Just some minor additional print

@@ -76,10 +76,10 @@ void spdz_genIrisMACShares(Iris* iris, Party* party) {
     }
 }
 
-void spdz_hammingDist(Iris* iris1, Iris* iris2, Party* party) {
+HammingDistance* spdz_hammingDist(Iris* iris1, Iris* iris2, Party* party) {
     if (iris1->size!=iris2->size) {
         printf("Mismatching iris sizes. Skipping check.\n");
-        return;
+        return NULL;
     }
     if (VERBOSE) T=0;
     else T=10;
@@ -123,13 +123,15 @@ void spdz_hammingDist(Iris* iris1, Iris* iris2, Party* party) {
         free(m1m2_struct);
     }
 
+    HammingDistance* res = hd_create(num, den);
     printf("[SPDZ_HD_%d] num: %d; den: %d\n", party->ID, num, den);
+    return res;
 }
 
-// Dealer will check the result by summing the ro_i values.
+// Dealer will check the result by summing the sigma_i values.
 void spdz_MACCheck(OpenValArray* openValues, RandArray* randValues, int key, int dealer) {
     int i;
-    int a=0, gamma_i=0, ro_i;
+    int a=0, gamma_i=0, sigma_i;
 
     int numVals       = openValues->nextFree;
     int* openVals     = openValues->values;
@@ -142,6 +144,7 @@ void spdz_MACCheck(OpenValArray* openValues, RandArray* randValues, int key, int
         int gamma_aj_i = openVals_MAC[i];
         gamma_i       += gamma_aj_i*randVals[i];
     }
-    ro_i = gamma_i - a*key;
-    printf("Broadcasting ro (%d).\n", ro_i);
+    sigma_i = gamma_i - a*key;
+    printf("Broadcasting ro (%d).\n", sigma_i);
+    sendInt(sigma_i, dealer);
 }

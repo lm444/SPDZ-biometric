@@ -15,6 +15,6 @@ typedef struct Party {
     OpenValArray* openValArray;
 } Party;
 
-Party* party_create(int ID, int MACKey, int peer, TripleArray* tripleArray, RandArray* randArray, OpenValArray* openValArray);
+Party* party_create(int ID, int MACkey, int peer, TripleArray* tripleArray, RandArray* randArray, OpenValArray* openValArray);
 void party_destroy(Party* party);
 #endif

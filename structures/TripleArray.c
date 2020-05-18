@@ -75,7 +75,7 @@ TripleArray** generateTriples(int numTriples, int MACKey) {
 
         serverShares[i].a = randA - rand()%TRIPLE_MAX_VAL;
         serverShares[i].b = randB - rand()%TRIPLE_MAX_VAL;
-        serverShares[i].c = randC - rand()%(TRIPLE_MAX_VAL*TRIPLE_MAX_VAL);
+        serverShares[i].c = randC - rand()%TRIPLE_MAX_VAL;
 
         clientShares[i].a = randA - serverShares[i].a;
         clientShares[i].b = randB - serverShares[i].b;

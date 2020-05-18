@@ -5,10 +5,10 @@
 #include "Common.h"
 #include "Debug.h"
 
-void debug_hammingDistClear(Iris* iris1, Iris* iris2) {
+HammingDistance* debug_hammingDistClear(Iris* iris1, Iris* iris2) {
     if (iris1->size!=iris2->size) {
         printf("Mismatching iris sizes. Skipping check.\n");
-        return;
+        return NULL;
     }
 
     // Hamming distance, in the clear
@@ -40,6 +40,6 @@ void debug_hammingDistClear(Iris* iris1, Iris* iris2) {
 
     printf("[DEBUG_HD] num: %d; den: %d\n", num, den);
 
-    if (num<den*THRESHOLD) printf("Authentication succeded.\n");
-    else printf("Authentication failed.\n");
+    HammingDistance* res = hd_create(num, den);
+    return res;
 }
