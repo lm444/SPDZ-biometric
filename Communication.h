@@ -7,16 +7,16 @@
 #define DEALER_ADDR "127.0.0.1"
 #define DEALER_PORT 5556
 
-int connectionTo(const char* IPaddr, int port);
-int bindPort(int port);
-int connectionFrom(int port);
+int net_connect(const char* IPaddr, int port);
+int net_bind(int port);
+int net_accept(int port);
 
-int sendTo(int to, void* data, int size, int flags);
-int recvFrom(int from, void* buf, int size, int flags);
+int net_send(int to, void* data, int size, int flags);
+int net_recv(int from, void* buf, int size, int flags);
 
-void sendMACkeyShare(int MACkeyShare, int to);
-int recvMACkeyShare(int from);
-void sendInt(int share, int to);
-int recvInt(int from);
+void net_sendMACkeyShare(int MACkeyShare, int to);
+int net_recvMACkeyShare(int from);
+void net_sendInt(int share, int to);
+int net_recvInt(int from);
 
 #endif

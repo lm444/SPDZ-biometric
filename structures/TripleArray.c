@@ -167,20 +167,20 @@ TripleArray** tripleArray_genShares(TripleArray* arr) {
 int tripleArray_send(TripleArray* arr, int numTriples, int to) {
     int ret;
     Triple* triples = tripleArray_consume(arr, numTriples);
-    ret = sendTo(to, &numTriples, sizeof(int), 0);
+    ret = net_send(to, &numTriples, sizeof(int), 0);
     assert(ret==4);
 
-    ret=sendTo(to, triples, numTriples*sizeof(Triple), 0);
+    ret = net_send(to, triples, numTriples*sizeof(Triple), 0);
     assert(ret==numTriples*sizeof(Triple));
     return numTriples;
 }
 
 TripleArray* tripleArray_recv(int from) {
     int numTriples; 
-    recvFrom(from, &numTriples, sizeof(int), 0);
+    net_recv(from, &numTriples, sizeof(int), 0);
     
     TripleArray* res = tripleArray_create(numTriples);
-    recvFrom(from, res->triples, numTriples*sizeof(Triple), 0);
+    net_recv(from, res->triples, numTriples*sizeof(Triple), 0);
     res->freeSpace = res->freeSpace-numTriples;
     res->nextFree  = (res->nextAvailable+numTriples)%res->size;
     return res;

@@ -11,7 +11,7 @@ int T; // temporary global variable for debugs
 
 #define SAVE_OPEN 1
 
-// mode: 0         -> will NOT save open values
+// mode: 0         -> will NOT save open values (ignores MAC_x and MAC_y also)
 // mode: SAVE_OPEN -> will save open values
 // Will return an int[2] arr. arr[0] -> value, arr[1] -> MAC_value
 int* spdz_mult(int x, int y, int MAC_x, int MAC_y, Party* party, int mode) {
@@ -32,10 +32,10 @@ int* spdz_mult(int x, int y, int MAC_x, int MAC_y, Party* party, int mode) {
     epsilonShare = x-a; // gamma(x)_0 - gamma(a)_0
     deltaShare   = y-b; // 
     
-    sendInt(epsilonShare, party->peer);
-    sendInt(deltaShare, party->peer);
-    epsilon = epsilonShare + recvInt(party->peer);
-    delta   = deltaShare   + recvInt(party->peer);
+    net_sendInt(epsilonShare, party->peer);
+    net_sendInt(deltaShare, party->peer);
+    epsilon = epsilonShare + net_recvInt(party->peer);
+    delta   = deltaShare   + net_recvInt(party->peer);
 
     if (mode==SAVE_OPEN) {
         openValArray_insert(party->openValArray, epsilon, MAC_x-MAC_a);
@@ -129,22 +129,42 @@ HammingDistance* spdz_hammingDist(Iris* iris1, Iris* iris2, Party* party) {
 }
 
 // Dealer will check the result by summing the sigma_i values.
-void spdz_MACCheck(OpenValArray* openValues, RandArray* randValues, int key, int dealer) {
+// Returns the share of the Hamming distance of the peer 
+// if no corruption was detected; else will terminate.
+HammingDistance* spdz_MACCheck(Party* party, int dealer, HammingDistance* hd) {
     int i;
     int a=0, gamma_i=0, sigma_i;
 
-    int numVals       = openValues->nextFree;
-    int* openVals     = openValues->values;
-    int* randVals     = randValues->values;
-    int* openVals_MAC = openValues->MAC_values;
-    
+    int numVals       = party->openValArray->nextFree;
+    int* openVals     = party->openValArray->values;
+    int* randVals     = party->randArray->values;
+    int* openVals_MAC = party->openValArray->MAC_values;
+    int MACkey        = party->MACkey;
+
     printf("Batch checking all %d open values.\n", numVals);
     for (i=0; i<numVals; i++) a+=openVals[i]*randVals[i];
     for (i=0; i<numVals; i++) {
         int gamma_aj_i = openVals_MAC[i];
         gamma_i       += gamma_aj_i*randVals[i];
     }
-    sigma_i = gamma_i - a*key;
-    printf("Broadcasting ro (%d).\n", sigma_i);
-    sendInt(sigma_i, dealer);
+    sigma_i = gamma_i - a*MACkey;
+
+    // Committing both the Hamming distance and the sigma_i
+    printf("Committing sigma_i (%d).\n", sigma_i);
+    net_sendInt(sigma_i, dealer);
+    printf("Committing Hamming distance.\n");
+    hd_send(hd, dealer);
+
+    int sigma_other = net_recvInt(dealer);
+    printf("Received sigma_other from the peer (%d).\n", sigma_other);
+
+    // locally checking if anyone cheated
+    if (sigma_i+sigma_other != 0) {
+        printf("Aborting computation: somebody cheated!\n");
+        net_sendInt(1, dealer);
+        exit(1);
+    }
+    net_sendInt(0, dealer);
+
+    return hd_recv(dealer);
 }

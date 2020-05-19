@@ -10,6 +10,6 @@
 
 void spdz_genIrisMACShares(Iris* iris, Party* party);
 HammingDistance* spdz_hammingDist(Iris* iris1, Iris* iris2, Party* party);
-void spdz_MACCheck(OpenValArray* openValues, RandArray* randValues, int key, int dealer);
+HammingDistance* spdz_MACCheck(Party* party, int dealer, HammingDistance* hd);
 
 #endif

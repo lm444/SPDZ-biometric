@@ -1,10 +1,10 @@
 #include "Common.h"
 
-// Connection primitives; wrappers
+// Communication wrappers
 
 #define BUFFER_SIZE 4096
 
-int bindPort(int port) {
+int net_bind(int port) {
     int ret, socket_desc;
 
     struct sockaddr_in server_addr = {0};
@@ -29,7 +29,7 @@ int bindPort(int port) {
     return socket_desc;
 }
 
-int connectionFrom(int socket_desc) {
+int net_accept(int socket_desc) {
     int client_desc;
 
     int sockaddr_len = sizeof(struct sockaddr_in);
@@ -42,7 +42,7 @@ int connectionFrom(int socket_desc) {
     return client_desc;
 }
 
-int connectionTo(const char* IPaddr, int port) {
+int net_connect(const char* IPaddr, int port) {
     int ret, desc;
     struct sockaddr_in server_addr = {0};
     desc = socket(AF_INET, SOCK_STREAM, 0);
@@ -58,9 +58,8 @@ int connectionTo(const char* IPaddr, int port) {
     return desc;
 }
 
-// Socket operations
-
-int sendTo(int to, void* data, int size, int flags) {                   // if size > BUFFER_SIZE, will split into multiple sends
+// if size > BUFFER_SIZE, will split into multiple sends
+int net_send(int to, void* data, int size, int flags) {                   
     int ret, sentBytes=0;
     int currWindow = BUFFER_SIZE;
 
@@ -77,7 +76,8 @@ int sendTo(int to, void* data, int size, int flags) {                   // if si
     return sentBytes;
 }
 
-int recvFrom(int from, void* buf, int size, int flags) {                // if size > BUFFER_SIZE, will split into multiple recvs
+// if size > BUFFER_SIZE, will split into multiple recvs
+int net_recv(int from, void* buf, int size, int flags) {                
     int ret, recvBytes=0;
     int currWindow = BUFFER_SIZE;
 
@@ -96,22 +96,22 @@ int recvFrom(int from, void* buf, int size, int flags) {                // if si
 
 // Application-specific methods
 
-void sendInt(int share, int to) {
-    sendTo(to, &share, sizeof(int), 0);
+void net_sendInt(int share, int to) {
+    net_send(to, &share, sizeof(int), 0);
 }
 
-int recvInt(int from) {
+int net_recvInt(int from) {
     int res;
-    recvFrom(from, &res, sizeof(int), 0);
+    net_recv(from, &res, sizeof(int), 0);
     return res;
 }
 
 // Detached from the generic sendIntShare to simplify modification
 // for a different representation of the MAC key (e.g. uint64)
-void sendMACkeyShare(int MACkeyShare, int to) {
-    sendInt(MACkeyShare, to);
+void net_sendMACkeyShare(int MACkeyShare, int to) {
+    net_sendInt(MACkeyShare, to);
 }
 
-int recvMACkeyShare(int from) {
-    return recvInt(from);
+int net_recvMACkeyShare(int from) {
+    return net_recvInt(from);
 }

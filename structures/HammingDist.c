@@ -15,13 +15,13 @@ void hd_destroy(HammingDistance* hd) {
 
 int hd_send(HammingDistance* hd, int to) {
     int ret;
-    ret=sendTo(to, hd, sizeof(HammingDistance), 0);
+    ret=net_send(to, hd, sizeof(HammingDistance), 0);
     assert(ret==sizeof(HammingDistance));
     return ret;
 }
 
 HammingDistance* hd_recv(int from) {
     HammingDistance* res = hd_create(0,0);
-    recvFrom(from, res, sizeof(HammingDistance), 0);
+    net_recv(from, res, sizeof(HammingDistance), 0);
     return res;
 }

@@ -96,9 +96,10 @@ void testSPDZ() {
 	HammingDistance* hd_clear = debug_hammingDistClear(serverIrisClear, clientIrisClear);
 	hd_send(hd_clear, dealer_desc);
 	HammingDistance* hd_share = spdz_hammingDist(serverIris, clientOtherShares, server);
-	hd_send(hd_share, dealer_desc);
+	HammingDistance* hd_other = spdz_MACCheck(server, dealer_desc, hd_share);
+	printf("[SERVER] Successfully computed the HD: %d, %d\n", hd_share->num+hd_other->num, hd_share->den+hd_other->den);
 
-
+	hd_destroy(hd_other);
 	hd_destroy(hd_clear);
 	hd_destroy(hd_share);
 	iris_destroy(serverIrisClear);
@@ -126,19 +127,19 @@ void protocol() {
 }
 
 int main(int argc, char** argv) {
-	socket_desc = bindPort(SERVER_PORT);
-	dealer_desc	= connectionTo(DEALER_ADDR, DEALER_PORT);
+	socket_desc = net_bind(SERVER_PORT);
+	dealer_desc	= net_connect(DEALER_ADDR, DEALER_PORT);
 	printf("[SERVER] Connection to Dealer was successful.\n");
-	client_desc = connectionFrom(socket_desc);
+	client_desc = net_accept(socket_desc);
 	
 	// TD will send both the MAC key share and triples shares
-	MACkeyShare=recvMACkeyShare(dealer_desc);
+	MACkeyShare=net_recvMACkeyShare(dealer_desc);
 	printf("[SERVER] Received MACkeyShare: %d\n", MACkeyShare);
 
 	tripleArray=tripleArray_recv(dealer_desc);
 	printf("[SERVER] Received %d multiplicative triple shares, %d free space.\n", MAX_TRIPLES, tripleArray->freeSpace);
 
-	seed=recvInt(dealer_desc);
+	seed=net_recvInt(dealer_desc);
 	printf("[SERVER] Received seed %d.\n", seed);
 
 	randArray=randArray_create(tripleArray->size);
@@ -159,10 +160,8 @@ int main(int argc, char** argv) {
 	else protocol();
 
 	if (VERBOSE) openValArray_print(openValArray);
-	spdz_MACCheck(openValArray, randArray, MACkeyShare, dealer_desc);
 
 	party_destroy(server);
-
 	close(socket_desc);
 	close(client_desc);
 	close(dealer_desc);

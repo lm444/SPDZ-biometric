@@ -138,22 +138,22 @@ void destroyShares(Iris** shares) {
    Receives will happen in the same order. */
 
 void iris_send(Iris* iris, int to) {
-    sendTo(to, &iris->size, sizeof(int), 0);
+    net_send(to, &iris->size, sizeof(int), 0);
 
-    sendTo(to, iris->iriscode, iris->size*sizeof(int), 0);
-    sendTo(to, iris->mask,     iris->size*sizeof(int), 0);
+    net_send(to, iris->iriscode, iris->size*sizeof(int), 0);
+    net_send(to, iris->mask,     iris->size*sizeof(int), 0);
 	
 	if (VERBOSE) printf("Sent iris of size: %d.\n", iris->size);
 }
 
 Iris* iris_recv(int from) {
 	int size;
-    recvFrom(from, &size, sizeof(int), 0);
+    net_recv(from, &size, sizeof(int), 0);
 
 	Iris* res = iris_create(size);
 
-    recvFrom(from, res->iriscode, res->size*sizeof(int), 0);
-    recvFrom(from, res->mask,     res->size*sizeof(int), 0);
+    net_recv(from, res->iriscode, res->size*sizeof(int), 0);
+    net_recv(from, res->mask,     res->size*sizeof(int), 0);
 
 	if (VERBOSE) printf("Received iris of size: %d.\n", res->size);
     return res;

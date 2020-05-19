@@ -24,26 +24,24 @@ int main() {
     printf("[TRUSTED DEALER] Generated MAC shares: %d, %d.\n", MACkeyShares[SERVER], MACkeyShares[CLIENT]);
 
     printf("[TRUSTED DEALER] Will now generate %d multiplicative triples...\n", MAX_TRIPLES);
-    //TripleShares = generateTriples(MAX_TRIPLES, MACKey);
     TripleArray* triples = tripleArray_create(MAX_TRIPLES);
     tripleArray_populate(triples, MACkey);
     TripleShares = tripleArray_genShares(triples);
     tripleArray_destroy(triples);
     printf("[TRUSTED DEALER] Multiplicative triples generated.\n");
 
-
     // TD will have a connection with both the Server and the Client.
     // IMPORTANT: it is mandatory to run Dealer -> Server -> Client
 
-    int socket_desc = bindPort(DEALER_PORT);
-    int server_desc = connectionFrom(socket_desc);
+    int socket_desc = net_bind(DEALER_PORT);
+    int server_desc = net_accept(socket_desc);
     printf("[TRUSTED DEALER] Inbound connection from Server\n");
-    int client_desc = connectionFrom(socket_desc);
+    int client_desc = net_accept(socket_desc);
     printf("[TRUSTED DEALER] Inbound connection from Client\n");
 
     printf("[TRUSTED DEALER] Sending now MAC key shares...\n");
-    sendMACkeyShare(MACkeyShares[SERVER], server_desc);
-    sendMACkeyShare(MACkeyShares[CLIENT], client_desc);
+    net_sendMACkeyShare(MACkeyShares[SERVER], server_desc);
+    net_sendMACkeyShare(MACkeyShares[CLIENT], client_desc);
     printf("[TRUSTED DEALER] Sent MAC key shares.\n");
 
     printf("[TRUSTED DEALER] Sending now multiplicative triples key shares...\n");
@@ -55,8 +53,8 @@ int main() {
     // Client and Server has to generate the same random vector.
     int seed = rand();
     printf("[TRUSTED DEALER] Sending seed %d for the random value generation (for MAC check).\n", seed);
-    sendInt(seed, server_desc);
-    sendInt(seed, client_desc);
+    net_sendInt(seed, server_desc);
+    net_sendInt(seed, client_desc);
     
     tripleArray_destroy(TripleShares[SERVER]);
     tripleArray_destroy(TripleShares[CLIENT]);
@@ -73,21 +71,30 @@ int main() {
         hd_destroy(hd_server_clear);
     }
 
+    int sigma_client = net_recvInt(client_desc);
+    int sigma_server = net_recvInt(server_desc);
+
+    if (DEBUG) printf("[TRUSTED DEALER] Detected sigma sum: %d (0 = correct).\n", sigma_client+sigma_server);
+
+    printf("[TRUSTED DEALER] Opening sigma values.\n");
+    net_sendInt(sigma_client, server_desc);
+    net_sendInt(sigma_server, client_desc);
+
     HammingDistance* hd_client = hd_recv(client_desc);
     HammingDistance* hd_server = hd_recv(server_desc);
+
+    if (net_recvInt(server_desc)|net_recvInt(client_desc)) {
+        printf("[TRUSTED DEALER] Received communication that somebody cheated.\n");
+        printf("[TRUSTED DEALER] Terminating without opening HD values.\n");
+        exit(1);
+    }
 
     printf("[TRUSTED DEALER] Calculated HD in SPDZ: NUM %d | DEN %d\n", 
             hd_client->num+hd_server->num, hd_client->den+hd_server->den);
 
-    int sigma_client = recvInt(client_desc);
-    int sigma_server = recvInt(server_desc);
-
-    printf("[TRUSTED DEALER] Detected sigma sum: %d (0 = correct).\n", sigma_client+sigma_server);
-
-    if (sigma_client+sigma_server != 0) {
-        printf("[TRUSTED DEALER] ABORTING COMPUTATION: SOMEBODY CHEATED.\n");
-        exit(1);
-    }
+    printf("[TRUSTED DEALER] Opening HDs.\n");
+    hd_send(hd_client, server_desc);
+    hd_send(hd_server, client_desc);
 
     hd_destroy(hd_client);
     hd_destroy(hd_server);
