@@ -19,6 +19,22 @@ void tripleArray_destroy(TripleArray* arr) {
     free(arr);
 }
 
+void tripleArray_populate(TripleArray* arr, int MACkey) {
+    int i;
+
+    Triple* triples = arr->triples;
+
+    for (i=0; i<arr->size; i++) {
+        triples[i].a = rand()%TRIPLE_MAX_VAL;
+        triples[i].b = rand()%TRIPLE_MAX_VAL;
+        triples[i].c = triples[i].a*triples[i].b;
+
+        triples[i].MAC_a = MACkey*triples[i].a;
+        triples[i].MAC_b = MACkey*triples[i].b;
+        triples[i].MAC_c = MACkey*triples[i].c;         
+    }
+}
+
 // Returns a pointer starting from triples[nextAvailable].
 // Updates internal counters accordingly
 Triple* tripleArray_consume(TripleArray* arr, int numTriples) {
@@ -49,41 +65,43 @@ void tripleArray_print(TripleArray* arr) {
 	}
 }
 
-TripleArray** generateTriples(int numTriples, int MACKey) {
+TripleArray** tripleArray_genShares(TripleArray* arr) {
     int i;
-    int randA, randB, randC;
     int randMAC_a, randMAC_b, randMAC_c;
+    int rand_a, rand_b, rand_c;
 
     TripleArray** res = (TripleArray**) malloc(2*sizeof(Triple*));
 
-    res[SERVER] = tripleArray_create(numTriples);
-    res[CLIENT] = tripleArray_create(numTriples);
-    
+    res[SERVER] = tripleArray_create(arr->size);
+    res[CLIENT] = tripleArray_create(arr->size);
+
     // Will compact a bit references.
 
+    Triple* triples      = arr->triples;
     Triple* serverShares = res[SERVER]->triples;
     Triple* clientShares = res[CLIENT]->triples;
-
-    for (i=0; i<MAX_TRIPLES; i++) {
-        randA = rand()%TRIPLE_MAX_VAL;
-        randB = rand()%TRIPLE_MAX_VAL;
-        randC = randA*randB;
+    int numTriples       = arr->size;
+    
+    for (i=0; i<numTriples; i++) {
+        rand_a = rand()%TRIPLE_MAX_VAL;
+        rand_b = rand()%TRIPLE_MAX_VAL;
+        rand_c = rand()%TRIPLE_MAX_VAL;
 
         randMAC_a = rand()%TRIPLE_MAX_VAL;
         randMAC_b = rand()%TRIPLE_MAX_VAL;
         randMAC_c = rand()%TRIPLE_MAX_VAL;
 
-        serverShares[i].a = randA - rand()%TRIPLE_MAX_VAL;
-        serverShares[i].b = randB - rand()%TRIPLE_MAX_VAL;
-        serverShares[i].c = randC - rand()%TRIPLE_MAX_VAL;
+        serverShares[i].a = triples[i].a - rand_a;
+        serverShares[i].b = triples[i].b - rand_b;
+        serverShares[i].c = triples[i].c - rand_c;
 
-        clientShares[i].a = randA - serverShares[i].a;
-        clientShares[i].b = randB - serverShares[i].b;
-        clientShares[i].c = randC - serverShares[i].c;
+        clientShares[i].a = rand_a;
+        clientShares[i].b = rand_b;
+        clientShares[i].c = rand_c;
 
-        serverShares[i].MAC_a = (serverShares[i].a+clientShares[i].a)*MACKey - randMAC_a;
-        serverShares[i].MAC_b = (serverShares[i].b+clientShares[i].b)*MACKey - randMAC_b;
-        serverShares[i].MAC_c = (serverShares[i].c+clientShares[i].c)*MACKey - randMAC_c;
+        serverShares[i].MAC_a = triples[i].MAC_a - randMAC_a;
+        serverShares[i].MAC_b = triples[i].MAC_b - randMAC_b;
+        serverShares[i].MAC_c = triples[i].MAC_c - randMAC_c;
 
         clientShares[i].MAC_a = randMAC_a;
         clientShares[i].MAC_b = randMAC_b;
@@ -97,8 +115,8 @@ TripleArray** generateTriples(int numTriples, int MACKey) {
     if (DEBUG|VERBOSE) {
         int printTriples;
         if (VERBOSE==1) printTriples=DEBUG_PRINTELEMS;
-        else if (VERBOSE==2) printTriples=MAX_TRIPLES;
-        for (i=0; i<MAX_TRIPLES; i++) {
+        else if (VERBOSE==2) printTriples=numTriples;
+        for (i=0; i<numTriples; i++) {
             if (VERBOSE==1 && i<printTriples) {
                 printf("TripleShares[SERVER][%d] = %d, %d, %d", i, serverShares[i].a, serverShares[i].b, serverShares[i].c);
                 printf("\n");
@@ -125,19 +143,18 @@ TripleArray** generateTriples(int numTriples, int MACKey) {
                 int shared_b = serverShares[i].b+clientShares[i].b;
                 int shared_c = serverShares[i].c+clientShares[i].c;
                 assert(shared_a*shared_b == shared_c);
-                int shared_MAC_a   = serverShares[i].a*MACKey + clientShares[i].a*MACKey;
-                int shared_MAC_b   = serverShares[i].b*MACKey + clientShares[i].b*MACKey;
-                int shared_MAC_c   = serverShares[i].c*MACKey + clientShares[i].c*MACKey;
-                int expected_MAC_a = shared_a*MACKey;
-                int expected_MAC_b = shared_b*MACKey;
-                int expected_MAC_c = shared_c*MACKey;
+                int shared_MAC_a   = serverShares[i].MAC_a + clientShares[i].MAC_a;
+                int shared_MAC_b   = serverShares[i].MAC_b + clientShares[i].MAC_b;
+                int shared_MAC_c   = serverShares[i].MAC_c + clientShares[i].MAC_c;
+                int expected_MAC_a = triples[i].MAC_a;
+                int expected_MAC_b = triples[i].MAC_b;
+                int expected_MAC_c = triples[i].MAC_c;
                 assert(shared_MAC_a == expected_MAC_a);
                 assert(shared_MAC_b == expected_MAC_b);
                 assert(shared_MAC_c == expected_MAC_c);
             }
         }
     }
-
     res[SERVER]->freeSpace = res[SERVER]->freeSpace-numTriples;
     res[SERVER]->nextFree  = (res[SERVER]->nextAvailable+numTriples)%res[SERVER]->size;
     res[CLIENT]->freeSpace = res[CLIENT]->freeSpace-numTriples;

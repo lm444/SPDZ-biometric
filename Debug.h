@@ -2,7 +2,7 @@
 #define DEBUG_H_
 
 #include "./structures/Iris.h"
-#include "HammingDist.h"
+#include "./structures/HammingDist.h"
 
 HammingDistance* debug_hammingDistClear(Iris* iris1, Iris* iris2);
 

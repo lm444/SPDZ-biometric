@@ -7,7 +7,7 @@
 #include "./structures/RandArray.h"
 #include "./structures/OpenValArray.h"
 #include "Party.h"
-#include "HammingDist.h"
+#include "./structures/HammingDist.h"
 
 int MACkeyShare;
 TripleArray* tripleArray;

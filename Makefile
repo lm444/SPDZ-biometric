@@ -1,12 +1,12 @@
 structuresPath = ./structures/
 
-structuresClient = *.c
-structuresServer = *.c
-structuresDealer = TripleArray.c 
+structuresClient = $(structuresPath)*.c
+structuresServer = $(structuresPath)*.c
+structuresDealer = $(structuresPath)TripleArray.c $(structuresPath)HammingDist.c
 
-srcClient = Client.c Common.c Communication.c SPDZ.c Debug.c Party.c HammingDist.c $(structuresPath)$(structuresClient)
-srcServer = Server.c Common.c Communication.c SPDZ.c Debug.c Party.c HammingDist.c $(structuresPath)$(structuresServer)
-srcDealer = TrustedDealer.c Common.c Communication.c HammingDist.c $(structuresPath)$(structuresDealer)
+srcClient = Client.c Common.c Communication.c SPDZ.c Debug.c Party.c $(structuresClient)
+srcServer = Server.c Common.c Communication.c SPDZ.c Debug.c Party.c $(structuresServer)
+srcDealer = TrustedDealer.c Common.c Communication.c $(structuresDealer)
 
 
 binPath = ./bin/

@@ -22,12 +22,12 @@ typedef struct TripleArray {
 
 TripleArray* tripleArray_create(int size);
 void tripleArray_destroy(TripleArray* arr);
+void tripleArray_populate(TripleArray* arr, int MACkey);
 Triple* tripleArray_consume(TripleArray* arr, int numTriples);
 void tripleArray_print(TripleArray* arr);
 
 int tripleArray_send(TripleArray* arr, int numTriples, int to);
 TripleArray* tripleArray_recv(int from);
 
-TripleArray** generateTriples(int numTriples, int MACKey);
-
+TripleArray** tripleArray_genShares(TripleArray* arr);
 #endif

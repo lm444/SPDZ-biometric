@@ -1,7 +1,7 @@
 #include "Common.h"
 #include "Communication.h"
 #include "./structures/TripleArray.h"
-#include "HammingDist.h"
+#include "./structures/HammingDist.h"
 
 #define MAXVAL_MAC 10
 
@@ -16,15 +16,19 @@ int main() {
     // Offline phase: will generate triples shares and MAC key shares before connections
     int ret;
 
-    int MACKey = rand()%MAXVAL_MAC;
-    printf("[TRUSTED DEALER] Generated MAC key: %d.\n", MACKey);
-    MACkeyShares[SERVER] = (MACKey-(rand()-RAND_MAX/2))%MAXVAL_MAC;
-    MACkeyShares[CLIENT] = MACKey-MACkeyShares[SERVER];
-    assert(MACkeyShares[SERVER]+MACkeyShares[CLIENT]==MACKey);
+    int MACkey = rand()%MAXVAL_MAC;
+    printf("[TRUSTED DEALER] Generated MAC key: %d.\n", MACkey);
+    MACkeyShares[SERVER] = (MACkey-(rand()-RAND_MAX/2))%MAXVAL_MAC;
+    MACkeyShares[CLIENT] = MACkey-MACkeyShares[SERVER];
+    assert(MACkeyShares[SERVER]+MACkeyShares[CLIENT]==MACkey);
     printf("[TRUSTED DEALER] Generated MAC shares: %d, %d.\n", MACkeyShares[SERVER], MACkeyShares[CLIENT]);
 
     printf("[TRUSTED DEALER] Will now generate %d multiplicative triples...\n", MAX_TRIPLES);
-    TripleShares = generateTriples(MAX_TRIPLES, MACKey);
+    //TripleShares = generateTriples(MAX_TRIPLES, MACKey);
+    TripleArray* triples = tripleArray_create(MAX_TRIPLES);
+    tripleArray_populate(triples, MACkey);
+    TripleShares = tripleArray_genShares(triples);
+    tripleArray_destroy(triples);
     printf("[TRUSTED DEALER] Multiplicative triples generated.\n");
 
 
@@ -63,7 +67,7 @@ int main() {
         HammingDistance* hd_server_clear = hd_recv(server_desc);
         assert(hd_client_clear->num == hd_server_clear->num);
         assert(hd_client_clear->den == hd_server_clear->den);
-        printf("[TRUSTED DEALER] Calculated HD in SPDZ: NUM %d | DEN %d\n", 
+        printf("[TRUSTED DEALER] Calculated HD in the clear: NUM %d | DEN %d\n", 
                 hd_client_clear->num, hd_client_clear->den);
         hd_destroy(hd_client_clear);
         hd_destroy(hd_server_clear);
