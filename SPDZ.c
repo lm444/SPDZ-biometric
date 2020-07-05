@@ -1,19 +1,15 @@
 #include "SPDZ.h"
 #include "Common.h"
 #include "Communication.h"
-#include "./structures/Iris.h"
 #include "Party.h"
-
-// Assumption: Everyone follows the protocol taking triples in order from their list.
-// Could guard against it, but complexity would increase
+#include "Defines.h"
+#include "./structures/Iris.h"
 
 int T; // temporary global variable for debugs
 
-#define SAVE_OPEN 1
-
-// mode: 0         -> will NOT save open values (ignores MAC_x and MAC_y also)
-// mode: SAVE_OPEN -> will save open values
-// Will return an int[2] arr. arr[0] -> value, arr[1] -> MAC_value
+// mode: 0              -> will NOT save open values (ignores MAC_x and MAC_y also)
+// mode: MULT_SAVEOPEN  -> will save open values
+// Will return an int[2] res. res[0] -> value, res[1] -> MAC_value
 int* spdz_mult(int x, int y, int MAC_x, int MAC_y, Party* party, int mode) {
     int* res = malloc(2*sizeof(int));
     int epsilonShare, deltaShare; // known
@@ -37,7 +33,7 @@ int* spdz_mult(int x, int y, int MAC_x, int MAC_y, Party* party, int mode) {
     epsilon = epsilonShare + net_recvInt(party->peer);
     delta   = deltaShare   + net_recvInt(party->peer);
 
-    if (mode==SAVE_OPEN) {
+    if (mode==MULT_SAVEOPEN) {
         openValArray_insert(party->openValArray, epsilon, MAC_x-MAC_a);
         openValArray_insert(party->openValArray, delta, MAC_y-MAC_b);
     }
@@ -50,6 +46,7 @@ int* spdz_mult(int x, int y, int MAC_x, int MAC_y, Party* party, int mode) {
         T++;
     }
 
+    // only SERVER adds the constant epsilon*delta
     if (party->ID==SERVER) {
         res[0] = c + b*epsilon + a*delta + epsilon*delta;
         res[1] = MAC_c + MAC_b*epsilon + MAC_a*delta + party->MACkey*epsilon*delta;
@@ -64,6 +61,8 @@ int* spdz_mult(int x, int y, int MAC_x, int MAC_y, Party* party, int mode) {
 // Populate the iris' MAC fields
 // NOTE: iris is the share of an iris. 
 // Also, it will require communication.
+// No open values will be saved here 
+// (check the documentation for additional info)
 void spdz_genIrisMACShares(Iris* iris, Party* party) {
     int i;
     for (i=0; i<iris->size; i++) {
@@ -76,7 +75,7 @@ void spdz_genIrisMACShares(Iris* iris, Party* party) {
     }
 }
 
-HammingDistance* spdz_hammingDist(Iris* iris1, Iris* iris2, Party* party) {
+HammingDistance* spdz_hd(Iris* iris1, Iris* iris2, Party* party) {
     if (iris1->size!=iris2->size) {
         printf("Mismatching iris sizes. Skipping check.\n");
         return NULL;
@@ -87,6 +86,8 @@ HammingDistance* spdz_hammingDist(Iris* iris1, Iris* iris2, Party* party) {
     // Hamming distance
     int i;
     int num=0, den;
+
+    // only SERVER the constant N in the denominator
     if (party->ID==SERVER) den=iris1->size;
     else den=0;
 
@@ -100,8 +101,8 @@ HammingDistance* spdz_hammingDist(Iris* iris1, Iris* iris2, Party* party) {
         int MAC_m1 = iris1->MAC_mask[i];
         int MAC_m2 = iris2->MAC_mask[i];
         // num += (f1+f2-2*f1*f2)*(1-(m1+m2-m1*m2));
-        int* f1f2_struct = spdz_mult(f1, f2, MAC_f1, MAC_f2, party, SAVE_OPEN);
-        int* m1m2_struct = spdz_mult(m1, m2, MAC_m1, MAC_m2, party, SAVE_OPEN);
+        int* f1f2_struct = spdz_mult(f1, f2, MAC_f1, MAC_f2, party, MULT_SAVEOPEN);
+        int* m1m2_struct = spdz_mult(m1, m2, MAC_m1, MAC_m2, party, MULT_SAVEOPEN);
 
         int f1f2 = f1f2_struct[0];
         int m1m2 = m1m2_struct[0];
@@ -113,7 +114,7 @@ HammingDistance* spdz_hammingDist(Iris* iris1, Iris* iris2, Party* party) {
         int MAC_num1 = MAC_f1+MAC_f2-2*MAC_f1f2;
         int MAC_temp = -(MAC_m1+MAC_m2-MAC_m1m2);
 
-        int* num2_struct = spdz_mult(num1, temp, MAC_num1, MAC_temp, party, SAVE_OPEN);
+        int* num2_struct = spdz_mult(num1, temp, MAC_num1, MAC_temp, party, MULT_SAVEOPEN);
         int num2 = num2_struct[0];
 
         num += num1+num2;
@@ -135,6 +136,7 @@ HammingDistance* spdz_MACCheck(Party* party, int dealer, HammingDistance* hd) {
     int i;
     int a=0, gamma_i=0, sigma_i;
 
+    // simplyfing references
     int numVals       = party->openValArray->nextFree;
     int* openVals     = party->openValArray->values;
     int* randVals     = party->randArray->values;

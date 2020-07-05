@@ -1,8 +1,8 @@
 #include "TripleArray.h"
+#include "../Defines.h"
 #include "../Communication.h"
 #include "../Common.h"
 
-#define TRIPLE_MAX_VAL 10
 
 TripleArray* tripleArray_create(int size) {
     TripleArray* res    = (TripleArray*) malloc(sizeof(TripleArray));
@@ -25,8 +25,8 @@ void tripleArray_populate(TripleArray* arr, int MACkey) {
     Triple* triples = arr->triples;
 
     for (i=0; i<arr->size; i++) {
-        triples[i].a = rand()%TRIPLE_MAX_VAL;
-        triples[i].b = rand()%TRIPLE_MAX_VAL;
+        triples[i].a = rand()%MAXVAL_TRIPLE;
+        triples[i].b = rand()%MAXVAL_TRIPLE;
         triples[i].c = triples[i].a*triples[i].b;
 
         triples[i].MAC_a = MACkey*triples[i].a;
@@ -83,13 +83,13 @@ TripleArray** tripleArray_genShares(TripleArray* arr) {
     int numTriples       = arr->size;
     
     for (i=0; i<numTriples; i++) {
-        rand_a = rand()%TRIPLE_MAX_VAL;
-        rand_b = rand()%TRIPLE_MAX_VAL;
-        rand_c = rand()%TRIPLE_MAX_VAL;
+        rand_a = rand()%MAXVAL_TRIPLE;
+        rand_b = rand()%MAXVAL_TRIPLE;
+        rand_c = rand()%MAXVAL_TRIPLE;
 
-        randMAC_a = rand()%TRIPLE_MAX_VAL;
-        randMAC_b = rand()%TRIPLE_MAX_VAL;
-        randMAC_c = rand()%TRIPLE_MAX_VAL;
+        randMAC_a = rand()%MAXVAL_TRIPLE;
+        randMAC_b = rand()%MAXVAL_TRIPLE;
+        randMAC_c = rand()%MAXVAL_TRIPLE;
 
         serverShares[i].a = triples[i].a - rand_a;
         serverShares[i].b = triples[i].b - rand_b;

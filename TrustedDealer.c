@@ -1,9 +1,8 @@
 #include "Common.h"
 #include "Communication.h"
+#include "Defines.h"
 #include "./structures/TripleArray.h"
 #include "./structures/HammingDist.h"
-
-#define MAXVAL_MAC 10
 
 /* Every share will be structured in an array of two fields
    arr[0] will be related to the Server
@@ -16,9 +15,9 @@ int main() {
     // Offline phase: will generate triples shares and MAC key shares before connections
     int ret;
 
-    int MACkey = rand()%MAXVAL_MAC;
+    int MACkey = rand()%MAXVAL_MACKEY;
     printf("[TRUSTED DEALER] Generated MAC key: %d.\n", MACkey);
-    MACkeyShares[SERVER] = (MACkey-(rand()-RAND_MAX/2))%MAXVAL_MAC;
+    MACkeyShares[SERVER] = (MACkey-(rand()-RAND_MAX/2))%MAXVAL_MACKEY;
     MACkeyShares[CLIENT] = MACkey-MACkeyShares[SERVER];
     assert(MACkeyShares[SERVER]+MACkeyShares[CLIENT]==MACkey);
     printf("[TRUSTED DEALER] Generated MAC shares: %d, %d.\n", MACkeyShares[SERVER], MACkeyShares[CLIENT]);

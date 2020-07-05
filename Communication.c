@@ -1,9 +1,6 @@
 #include "Common.h"
 
 // Communication wrappers
-
-#define BUFFER_SIZE 4096
-
 int net_bind(int port) {
     int ret, socket_desc;
 

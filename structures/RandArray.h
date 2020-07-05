@@ -1,7 +1,7 @@
 #ifndef RANDARRAY_H_
 #define RANDARRAY_H_
 
-#define RANDARR_MAX 100000;
+#include "../Defines.h"
 
 typedef struct RandArray {
     int* values;

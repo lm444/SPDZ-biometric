@@ -47,13 +47,13 @@ void testServerFunctionalities() {
 
 	// Checking Hamming Distance between Irises (here: same iris)
 	printf("Now will try authentication check between two same irises...\n");
-	debug_hammingDistClear(iris, iris2);
+	debug_hd(iris, iris2);
 
 	// Arbitrary Iris modification
 	for (i=0; i<iris->size; i++) iris->iriscode[i]=1;
 
 	printf("Authentication check after arbitrarily modifying one of the two irises...\n");
-	debug_hammingDistClear(iris, iris2);
+	debug_hd(iris, iris2);
 
 	destroyShares(shares);
 	iris_destroy(iris);
@@ -93,9 +93,9 @@ void testSPDZ() {
 	printf("[SERVER] Printing server iris after MAC is populated...\n");
 	iris_print(clientOtherShares);
 
-	HammingDistance* hd_clear = debug_hammingDistClear(serverIrisClear, clientIrisClear);
+	HammingDistance* hd_clear = debug_hd(serverIrisClear, clientIrisClear);
 	hd_send(hd_clear, dealer_desc);
-	HammingDistance* hd_share = spdz_hammingDist(serverIris, clientOtherShares, server);
+	HammingDistance* hd_share = spdz_hd(serverIris, clientOtherShares, server);
 	HammingDistance* hd_other = spdz_MACCheck(server, dealer_desc, hd_share);
 	printf("[SERVER] Successfully computed the HD: %d, %d\n", hd_share->num+hd_other->num, hd_share->den+hd_other->den);
 
@@ -119,7 +119,7 @@ void protocol() {
 	Iris* clientIris = iris_recv(client_desc);
 
 	server = party_create(SERVER, MACkeyShare, client_desc, tripleArray, randArray, openValArray);
-	spdz_hammingDist(serverIris, clientIris, server);
+	spdz_hd(serverIris, clientIris, server);
 	
 	iris_destroy(serverIrisClear);
 	destroyShares(shares); 	      // will also destroy serverIris!

@@ -1,8 +1,6 @@
 #ifndef TRIPLEARRAY_H_
 #define TRIPLEARRAY_H_
 
-#define MAX_TRIPLES 5000000
-
 typedef struct Triple {
     int a;
     int MAC_a;

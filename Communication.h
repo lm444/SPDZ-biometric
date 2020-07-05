@@ -1,11 +1,7 @@
 #ifndef COMMUNICATIONS_H_
 #define COMMUNICATIONS_H_
 
-#define SERVER_ADDR "127.0.0.1"
-#define SERVER_PORT 5555
-
-#define DEALER_ADDR "127.0.0.1"
-#define DEALER_PORT 5556
+#include "Defines.h"
 
 int net_connect(const char* IPaddr, int port);
 int net_bind(int port);

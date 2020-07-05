@@ -5,7 +5,8 @@
 #include "Common.h"
 #include "Debug.h"
 
-HammingDistance* debug_hammingDistClear(Iris* iris1, Iris* iris2) {
+// calculates the Hamming distance in the clear
+HammingDistance* debug_hd(Iris* iris1, Iris* iris2) {
     if (iris1->size!=iris2->size) {
         printf("Mismatching iris sizes. Skipping check.\n");
         return NULL;

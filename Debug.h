@@ -4,6 +4,6 @@
 #include "./structures/Iris.h"
 #include "./structures/HammingDist.h"
 
-HammingDistance* debug_hammingDistClear(Iris* iris1, Iris* iris2);
+HammingDistance* debug_hd(Iris* iris1, Iris* iris2);
 
 #endif

@@ -9,7 +9,7 @@
 #include "./structures/HammingDist.h"
 
 void spdz_genIrisMACShares(Iris* iris, Party* party);
-HammingDistance* spdz_hammingDist(Iris* iris1, Iris* iris2, Party* party);
+HammingDistance* spdz_hd(Iris* iris1, Iris* iris2, Party* party);
 HammingDistance* spdz_MACCheck(Party* party, int dealer, HammingDistance* hd);
 
 #endif

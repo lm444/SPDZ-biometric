@@ -60,9 +60,9 @@ void testSPDZ() {
 	printf("[CLIENT] Printing client iris after MAC is populated...\n");
 	iris_print(clientIris);
 
-	HammingDistance* hd_clear = debug_hammingDistClear(clientIrisClear, serverIrisClear);
+	HammingDistance* hd_clear = debug_hd(clientIrisClear, serverIrisClear);
 	hd_send(hd_clear, dealer_desc);
-	HammingDistance* hd_share = spdz_hammingDist(serverOtherShares, clientIris, client);
+	HammingDistance* hd_share = spdz_hd(serverOtherShares, clientIris, client);
 	HammingDistance* hd_other = spdz_MACCheck(client, dealer_desc, hd_share);
 	printf("[CLIENT] Successfully computed the HD: %d, %d\n", hd_share->num+hd_other->num, hd_share->den+hd_other->den);
 
@@ -89,7 +89,7 @@ void protocol() {
 
 	Iris* serverIris = iris_recv(server_desc);
 	client = party_create(CLIENT, MACkeyShare, server_desc, tripleArray, randArray, openValArray);
-	spdz_hammingDist(serverIris, clientIris, client);
+	spdz_hd(serverIris, clientIris, client);
 
 	iris_destroy(clientIrisClear);
 	destroyShares(shares); 	      // will also destroy clientIris!

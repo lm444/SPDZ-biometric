@@ -83,7 +83,7 @@ void iris_destroy(Iris* iris) {
 }
 
 // Will return an array of two Irises containing the respective shares
-// Shares will be generated inside the interval (-P_FIELD-1, P_FIELD)
+// Shares will be generated inside the interval (-MAXVAL_IRISCODE-1, MAXVAL_IRISCODE)
 
 Iris** genIrisShares(Iris* iris) {
 	int i;
@@ -92,10 +92,10 @@ Iris** genIrisShares(Iris* iris) {
 	res[1] = iris_create(iris->size);
 
 	for (i=0; i<iris->size; i++) {
-		res[0]->iriscode[i]=(iris->iriscode[i]-rand()+RAND_MAX/2)%P_FIELD;
+		res[0]->iriscode[i]=(iris->iriscode[i]-rand()+RAND_MAX/2)%MAXVAL_IRISCODE;
 		res[1]->iriscode[i]=iris->iriscode[i]-res[0]->iriscode[i];
 
-		res[0]->mask[i]=(iris->mask[i]-rand()+RAND_MAX/2)%P_FIELD;
+		res[0]->mask[i]=(iris->mask[i]-rand()+RAND_MAX/2)%MAXVAL_IRISCODE;
 		res[1]->mask[i]=iris->mask[i]-res[0]->mask[i];
 	}
 
@@ -106,8 +106,8 @@ Iris** genIrisShares(Iris* iris) {
 				printf("mask[%d]=%d; Share0[%d]=%d; Share1[%d]=%d\n", i, iris->mask[i], i, res[0]->mask[i], i, res[1]->mask[i]);
 			}
 			if (DEBUG) {
-				assert((res[0]->iriscode[i]+res[1]->iriscode[i])%P_FIELD == iris->iriscode[i]);
-				assert((res[0]->mask[i]+res[1]->mask[i])%P_FIELD == iris->mask[i]);
+				assert((res[0]->iriscode[i]+res[1]->iriscode[i])%MAXVAL_IRISCODE == iris->iriscode[i]);
+				assert((res[0]->mask[i]+res[1]->mask[i])%MAXVAL_IRISCODE == iris->mask[i]);
 			}
 		}
 	}

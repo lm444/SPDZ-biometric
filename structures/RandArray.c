@@ -12,7 +12,7 @@ RandArray* randArray_create(int size) {
 void randArray_populate(RandArray* arr, int seed) {
     int i;
     srand(seed);
-    for (i=0; i<arr->size; i++) arr->values[i]=rand()%RANDARR_MAX;
+    for (i=0; i<arr->size; i++) arr->values[i]=rand()%MAXVAL_RANDARR;
 }
 
 int* randArray_consume(RandArray* arr, int numRands) {
