@@ -5,7 +5,7 @@
 #include "Defines.h"
 #include "./structures/Iris.h"
 
-int T; // temporary global variable for debugs
+int debug_print = 10; // prints up to debug_print spdz_mult(s) information
 
 // mode: 0              -> will NOT save open values (ignores MAC_x and MAC_y also)
 // mode: MULT_SAVEOPEN  -> will save open values
@@ -38,12 +38,12 @@ int* spdz_mult(int x, int y, int MAC_x, int MAC_y, Party* party, int mode) {
         openValArray_insert(party->openValArray, delta, MAC_y-MAC_b);
     }
 
-    if (T<10) {
-        printf("Check input: %d, %d\n", x, y);
-        printf("Check tripleShare: %d, %d, %d\n", a, b, c);
-        printf("Check epsilon-delta: %d, %d\n", epsilon, delta);
-        printf("Check output (without +e-d): %d\n", c + b*epsilon + a*delta);
-        T++;
+    if (VERBOSE && debug_print<10) {
+        printf("Checking input: %d, %d\n", x, y);
+        printf("Checking tripleShare: %d, %d, %d\n", a, b, c);
+        printf("Checking epsilon-delta: %d, %d\n", epsilon, delta);
+        printf("Checking output (without +e-d): %d\n", c + b*epsilon + a*delta);
+        debug_print++;
     }
 
     // only SERVER adds the constant epsilon*delta
@@ -80,8 +80,8 @@ HammingDistance* spdz_hd(Iris* iris1, Iris* iris2, Party* party) {
         printf("Mismatching iris sizes. Skipping check.\n");
         return NULL;
     }
-    if (VERBOSE) T=0;
-    else T=10;
+    if (VERBOSE) debug_print=0;
+    else debug_print=10;
 
     // Hamming distance
     int i;

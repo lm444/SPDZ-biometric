@@ -4,8 +4,8 @@ structuresClient = $(structuresPath)*.c
 structuresServer = $(structuresPath)*.c
 structuresDealer = $(structuresPath)TripleArray.c $(structuresPath)HammingDist.c
 
-srcClient = Client.c Common.c Communication.c SPDZ.c Debug.c Party.c $(structuresClient)
-srcServer = Server.c Common.c Communication.c SPDZ.c Debug.c Party.c $(structuresServer)
+srcClient = Client.c Common.c Communication.c SPDZ.c Debug.c Party.c Converter.c $(structuresClient)
+srcServer = Server.c Common.c Communication.c SPDZ.c Debug.c Party.c Converter.c $(structuresServer)
 srcDealer = TrustedDealer.c Common.c Communication.c $(structuresDealer)
 
 

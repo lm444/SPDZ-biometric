@@ -13,9 +13,7 @@ typedef struct Triple {
 typedef struct TripleArray {
     Triple* triples;
     int size;
-    int freeSpace;
     int nextAvailable;
-    int nextFree;
 } TripleArray;
 
 TripleArray* tripleArray_create(int size);

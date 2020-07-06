@@ -21,10 +21,7 @@
 #define SERVER 0
 #define CLIENT 1
 
-// Later will implement the converter in a different executable
-#define CONVERTER 0
-
 void handle_error(const char* msg);
-void shrinkIrisFile(const char* inputFile, const char* destFile);
+int check_features(int n);
 
 #endif

@@ -15,11 +15,15 @@ void randArray_populate(RandArray* arr, int seed) {
     for (i=0; i<arr->size; i++) arr->values[i]=rand()%MAXVAL_RANDARR;
 }
 
-int* randArray_consume(RandArray* arr, int numRands) {
+int* randArray_consume(RandArray* arr, int count) {
+    if (arr->nextAvailable+count > arr->size) {
+        printf("Out of bounds.\n");
+        exit(1);
+    }
     int* res           = arr->values+arr->nextAvailable;
-    arr->nextAvailable = (arr->nextAvailable+numRands)%arr->size;
-    if (VERBOSE && numRands>1) printf("Consumed %d rand(s).\n", numRands);
-    else if (VERBOSE==2) printf("Consumed %d rand(s).\n", numRands);
+    arr->nextAvailable = (arr->nextAvailable+count)%arr->size;
+    if (VERBOSE && count>1) printf("Consumed %d rand(s).\n", count);
+    else if (VERBOSE==2) printf("Consumed %d rand(s).\n", count);
     return res;
 }
 

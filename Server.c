@@ -2,13 +2,15 @@
 #include "Communication.h"
 #include "SPDZ.h"
 #include "Debug.h"
+#include "Party.h"
+#include "Converter.h"
 #include "./structures/Iris.h"
 #include "./structures/TripleArray.h"
 #include "./structures/RandArray.h"
 #include "./structures/OpenValArray.h"
-#include "Party.h"
 #include "./structures/HammingDist.h"
 
+char* iris_server;
 int MACkeyShare;
 TripleArray* tripleArray;
 int seed;
@@ -61,6 +63,7 @@ void testServerFunctionalities() {
 	exit(0);
 }
 
+// debug ONLY with IRIS_SERVER and IRIS_CLIENT.
 void testSPDZ() {
 	int i;
 	Iris* clientIrisClear = iris_read(IRIS_CLIENT); // for operation check purposes only
@@ -69,10 +72,11 @@ void testSPDZ() {
 
 	Iris* serverIris = shares[0];
 	iris_send(shares[1], client_desc);
-	iris_send(shares[0], client_desc); // will send even the Server's share, for checks clientside
+	iris_send(shares[0], client_desc); // will send even the Server's shares, for checks clientside
 
 	Iris* clientOtherShares  = iris_recv(client_desc);
 	Iris* clientSelfShares   = iris_recv(client_desc);
+
 
 	// terminates if communication failure
 	for (i=0; i<clientIrisClear->size; i++) {
@@ -110,7 +114,7 @@ void testSPDZ() {
 }
 
 void protocol() {
-	Iris* serverIrisClear = iris_read(IRIS_SERVER);		
+	Iris* serverIrisClear = iris_read(iris_server);		
 	Iris** shares = genIrisShares(serverIrisClear);
 
 	Iris* serverIris = shares[0];
@@ -119,14 +123,31 @@ void protocol() {
 	Iris* clientIris = iris_recv(client_desc);
 
 	server = party_create(SERVER, MACkeyShare, client_desc, tripleArray, randArray, openValArray);
-	spdz_hd(serverIris, clientIris, server);
-	
+
+	printf("[SERVER] Populating server iris' MAC ...\n");
+	spdz_genIrisMACShares(serverIris, server);
+	printf("[SERVER] Populating client iris' MAC...\n");
+	spdz_genIrisMACShares(clientIris, server);
+
+	HammingDistance* hd_share = spdz_hd(serverIris, clientIris, server);
+	HammingDistance* hd_other = spdz_MACCheck(server, dealer_desc, hd_share);
+	printf("[SERVER] Successfully computed the HD: %d, %d\n", hd_share->num+hd_other->num, hd_share->den+hd_other->den);
+
+	hd_destroy(hd_other);
+	hd_destroy(hd_share);
 	iris_destroy(serverIrisClear);
 	destroyShares(shares); 	      // will also destroy serverIris!
 	iris_destroy(clientIris);
 }
 
 int main(int argc, char** argv) {
+	if (argc<2) {
+		printf("usage: ./server <irisfile>\n");
+		exit(1);
+	}
+
+	iris_server = conv_if(argv[1]);
+
 	socket_desc = net_bind(SERVER_PORT);
 	dealer_desc	= net_connect(DEALER_ADDR, DEALER_PORT);
 	printf("[SERVER] Connection to Dealer was successful.\n");
@@ -137,7 +158,7 @@ int main(int argc, char** argv) {
 	printf("[SERVER] Received MACkeyShare: %d\n", MACkeyShare);
 
 	tripleArray=tripleArray_recv(dealer_desc);
-	printf("[SERVER] Received %d multiplicative triple shares, %d free space.\n", MAX_TRIPLES, tripleArray->freeSpace);
+	printf("[SERVER] Received %d multiplicative triple shares.\n", MAX_TRIPLES);
 
 	seed=net_recvInt(dealer_desc);
 	printf("[SERVER] Received seed %d.\n", seed);
@@ -153,8 +174,7 @@ int main(int argc, char** argv) {
 	if (VERBOSE) tripleArray_print(tripleArray);
 	
 	// if (DEBUG) testServerFunctionalities();
-	if (CONVERTER) shrinkIrisFile("irisServer_raw.txt", IRIS_SERVER);
-
+	
 	// Same as Client
 	if (DEBUG) testSPDZ();
 	else protocol();

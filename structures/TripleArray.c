@@ -8,9 +8,7 @@ TripleArray* tripleArray_create(int size) {
     TripleArray* res    = (TripleArray*) malloc(sizeof(TripleArray));
     res->triples        = (Triple*) malloc(size*sizeof(Triple));
     res->size           = size;
-    res->freeSpace      = size;
     res->nextAvailable  = 0;
-    res->nextFree       = 0;
     return res;
 }
 
@@ -19,6 +17,7 @@ void tripleArray_destroy(TripleArray* arr) {
     free(arr);
 }
 
+// populates the triple array with random values
 void tripleArray_populate(TripleArray* arr, int MACkey) {
     int i;
 
@@ -35,14 +34,16 @@ void tripleArray_populate(TripleArray* arr, int MACkey) {
     }
 }
 
-// Returns a pointer starting from triples[nextAvailable].
-// Updates internal counters accordingly
-Triple* tripleArray_consume(TripleArray* arr, int numTriples) {
-    Triple* res        = arr->triples+arr->nextAvailable;
-    arr->freeSpace     = arr->freeSpace+numTriples;
-    arr->nextAvailable = (arr->nextAvailable+numTriples)%arr->size;
-    if (VERBOSE && numTriples>1) printf("Consumed %d triple(s). New free space: %d.\n", numTriples, arr->freeSpace);
-    else if (VERBOSE==2) printf("Consumed %d triple(s). New free space: %d.\n", numTriples, arr->freeSpace);
+// returns a pointer starting from triples[nextAvailable]
+Triple* tripleArray_consume(TripleArray* arr, int count) {
+    if (arr->nextAvailable+count > arr->size) {
+        printf("Out of bounds.\n");
+        exit(1);
+    }
+    Triple* res         = arr->triples+arr->nextAvailable;
+    arr->nextAvailable += count;
+    if (VERBOSE && count>1) printf("Consumed %d triple(s).\n", count);
+    else if (VERBOSE==2) printf("Consumed %d triple(s).\n", count);
     return res;
 }
 
@@ -155,10 +156,6 @@ TripleArray** tripleArray_genShares(TripleArray* arr) {
             }
         }
     }
-    res[SERVER]->freeSpace = res[SERVER]->freeSpace-numTriples;
-    res[SERVER]->nextFree  = (res[SERVER]->nextAvailable+numTriples)%res[SERVER]->size;
-    res[CLIENT]->freeSpace = res[CLIENT]->freeSpace-numTriples;
-    res[CLIENT]->nextFree  = (res[CLIENT]->nextAvailable+numTriples)%res[CLIENT]->size;
     return res;
 }
 
@@ -181,7 +178,5 @@ TripleArray* tripleArray_recv(int from) {
     
     TripleArray* res = tripleArray_create(numTriples);
     net_recv(from, res->triples, numTriples*sizeof(Triple), 0);
-    res->freeSpace = res->freeSpace-numTriples;
-    res->nextFree  = (res->nextAvailable+numTriples)%res->size;
     return res;
 }

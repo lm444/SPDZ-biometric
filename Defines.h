@@ -5,7 +5,7 @@
 #define DEALER_ADDR "127.0.0.1"
 #define DEALER_PORT 5556
 
-#define BUFFER_SIZE 4096
+#define BUFFER_SIZE 4096 // buffer size for send/recv
 
 // settings for spdz_mult
 #define MULT_SAVEOPEN 1
@@ -26,7 +26,7 @@
    2 - Includes lenghty prints (care!)
 */
 #define VERBOSE 	0
-#define DEBUG 		1
+#define DEBUG 		0
 
 // triples that will be generated and sent
 #define MAX_TRIPLES 5000000
@@ -34,3 +34,10 @@
 // threshold of comparison
 // still unused atm
 #define THRESHOLD 0.25
+
+// conversion
+#define IO_BUFFER_SIZE 65536
+
+#define FILENAME_MAXCONVLEN 256
+#define FILENAME_MAXLEN     128
+#define FILENAME_CONVSTR    "conv_"

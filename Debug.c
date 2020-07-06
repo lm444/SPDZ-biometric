@@ -1,7 +1,3 @@
-// There will be defined operations in the clear (aka without SPDZ)
-// Utility in checking results.
-// Will be a lot verbose 
-
 #include "Common.h"
 #include "Debug.h"
 
@@ -25,13 +21,7 @@ HammingDistance* debug_hd(Iris* iris1, Iris* iris2) {
 
         int f1f2 = f1*f2;
         int m1m2 = m1*m2;
-/*
-        int num1 = f1+f2-2*f1f2;
-        int temp = -(m1+m2-m1m2);
-        int num2 = num1*temp;
 
-        num += num1+num2;
-*/
         int num1 = f1+f2-2*f1f2;
         int num2 = 1-(m1+m2-m1m2);
 
