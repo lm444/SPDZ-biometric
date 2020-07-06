@@ -37,7 +37,7 @@ char* conv_if(const char* input_file) {
 	res[validBytes]='\0';
 
 	ret = check_features(validBytes);
-	if (ret==0) {
+	if (validBytes==readBytes && ret==0) {
 		printf("[CONV] Detected a valid iris file.\n");
 		close(fd);
 		return (char*) input_file;
@@ -60,6 +60,7 @@ char* conv_if(const char* input_file) {
     ret = check_features(validBytes);
     if (ret<0) {
         printf("[CONV] The input file isn't valid. Please double-check it.\n");
+		remove(output_file);
         exit(1);
     }
 	
