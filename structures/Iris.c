@@ -15,10 +15,10 @@ Iris* iris_create(int size) {
 	return res;
 }
 
-Iris* iris_read(const char* inputFile) {    
+Iris* iris_read(const char* input_file) {    
 	int fd, ret, size;
 
-	fd = open(inputFile, O_RDONLY);
+	fd = open(input_file, O_RDONLY);
 	if (fd<0) handle_error("Error while opening input file");
 
 

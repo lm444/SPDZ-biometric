@@ -2,7 +2,6 @@
 #include "Communication.h"
 #include "SPDZ.h"
 #include "Debug.h"
-#include "Party.h"
 #include "Converter.h"
 #include "./structures/TripleArray.h"
 #include "./structures/RandArray.h"
@@ -54,18 +53,18 @@ void testSPDZ() {
 
 	printf("[CLIENT] Printing server iris before MAC is populated...\n");
 	iris_print(serverOtherShares);
-	spdz_genIrisMACShares(serverOtherShares, client);
+	spdz_genIrisMACShares(client, serverOtherShares);
 	printf("[CLIENT] Printing server iris after MAC is populated...\n");
 	iris_print(serverOtherShares);
 	printf("[CLIENT] Printing client iris before MAC is populated...\n");
 	iris_print(clientIris);
-	spdz_genIrisMACShares(clientIris, client);
+	spdz_genIrisMACShares(client, clientIris);
 	printf("[CLIENT] Printing client iris after MAC is populated...\n");
 	iris_print(clientIris);
 
 	HammingDistance* hd_clear = debug_hd(clientIrisClear, serverIrisClear);
 	hd_send(hd_clear, dealer_desc);
-	HammingDistance* hd_share = spdz_hd(serverOtherShares, clientIris, client);
+	HammingDistance* hd_share = spdz_hd(client, serverOtherShares, clientIris);
 	HammingDistance* hd_other = spdz_MACCheck(client, dealer_desc, hd_share);
 	printf("[CLIENT] Successfully computed the HD: %d, %d\n", hd_share->num+hd_other->num, hd_share->den+hd_other->den);
 
@@ -94,11 +93,11 @@ void protocol() {
 	client = party_create(CLIENT, MACkeyShare, server_desc, tripleArray, randArray, openValArray);
 
 	printf("[CLIENT] Populating server iris' MAC...\n");
-	spdz_genIrisMACShares(serverIris, client);
+	spdz_genIrisMACShares(client, serverIris);
 	printf("[CLIENT] Populating client iris' MAC...\n");
-	spdz_genIrisMACShares(clientIris, client);
+	spdz_genIrisMACShares(client, clientIris);
 
-	HammingDistance* hd_share = spdz_hd(serverIris, clientIris, client);
+	HammingDistance* hd_share = spdz_hd(client, serverIris, clientIris);
 	HammingDistance* hd_other = spdz_MACCheck(client, dealer_desc, hd_share);
 
 	printf("[CLIENT] Successfully computed the HD: %d, %d\n", hd_share->num+hd_other->num, hd_share->den+hd_other->den);

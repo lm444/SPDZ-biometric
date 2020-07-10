@@ -34,3 +34,21 @@ HammingDistance* debug_hd(Iris* iris1, Iris* iris2) {
     HammingDistance* res = hd_create(num, den);
     return res;
 }
+/*
+#define SAMPLES_CNT 5
+#define SAMPLE_1 "108_1_6400.txt"
+#define SAMPLE_2 "108_2_6400.txt"
+#define SAMPLE_3 "108_3_6400.txt"
+#define SAMPLE_4 "108_4_6400.txt"
+#define SAMPLE_5 "108_5_6400.txt"
+
+void sample_execution() {
+    char* sampleifs[SAMPLES_CNT];
+    sampleifs[0]=conv_if(SAMPLE_1);
+    sampleifs[1]=conv_if(SAMPLE_2);
+    sampleifs[2]=conv_if(SAMPLE_3);
+    sampleifs[3]=conv_if(SAMPLE_4);
+    sampleifs[4]=conv_if(SAMPLE_5);
+
+}
+*/

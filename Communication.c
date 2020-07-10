@@ -39,13 +39,13 @@ int net_accept(int socket_desc) {
     return client_desc;
 }
 
-int net_connect(const char* IPaddr, int port) {
+int net_connect(const char* IP, int port) {
     int ret, desc;
     struct sockaddr_in server_addr = {0};
     desc = socket(AF_INET, SOCK_STREAM, 0);
 	if (desc<0) handle_error("Socket create");
 
-	server_addr.sin_addr.s_addr = inet_addr(IPaddr);
+	server_addr.sin_addr.s_addr = inet_addr(IP);
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port);
 

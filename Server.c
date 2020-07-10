@@ -2,7 +2,6 @@
 #include "Communication.h"
 #include "SPDZ.h"
 #include "Debug.h"
-#include "Party.h"
 #include "Converter.h"
 #include "./structures/Iris.h"
 #include "./structures/TripleArray.h"
@@ -88,18 +87,18 @@ void testSPDZ() {
 
 	printf("[SERVER] Printing server iris before MAC is populated...\n");
 	iris_print(serverIris);
-	spdz_genIrisMACShares(serverIris, server);
+	spdz_genIrisMACShares(server, serverIris);
 	printf("[SERVER] Printing server iris after MAC is populated...\n");
 	iris_print(serverIris);
 	printf("[SERVER] Printing client iris before MAC is populated...\n");
 	iris_print(clientOtherShares);
-	spdz_genIrisMACShares(clientOtherShares, server);
+	spdz_genIrisMACShares(server, clientOtherShares);
 	printf("[SERVER] Printing server iris after MAC is populated...\n");
 	iris_print(clientOtherShares);
 
 	HammingDistance* hd_clear = debug_hd(serverIrisClear, clientIrisClear);
 	hd_send(hd_clear, dealer_desc);
-	HammingDistance* hd_share = spdz_hd(serverIris, clientOtherShares, server);
+	HammingDistance* hd_share = spdz_hd(server, serverIris, clientOtherShares);
 	HammingDistance* hd_other = spdz_MACCheck(server, dealer_desc, hd_share);
 	printf("[SERVER] Successfully computed the HD: %d, %d\n", hd_share->num+hd_other->num, hd_share->den+hd_other->den);
 
@@ -125,11 +124,11 @@ void protocol() {
 	server = party_create(SERVER, MACkeyShare, client_desc, tripleArray, randArray, openValArray);
 
 	printf("[SERVER] Populating server iris' MAC ...\n");
-	spdz_genIrisMACShares(serverIris, server);
+	spdz_genIrisMACShares(server, serverIris);
 	printf("[SERVER] Populating client iris' MAC...\n");
-	spdz_genIrisMACShares(clientIris, server);
+	spdz_genIrisMACShares(server, clientIris);
 
-	HammingDistance* hd_share = spdz_hd(serverIris, clientIris, server);
+	HammingDistance* hd_share = spdz_hd(server, serverIris, clientIris);
 	HammingDistance* hd_other = spdz_MACCheck(server, dealer_desc, hd_share);
 	printf("[SERVER] Successfully computed the HD: %d, %d\n", hd_share->num+hd_other->num, hd_share->den+hd_other->den);
 

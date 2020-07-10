@@ -10,7 +10,7 @@ typedef struct Iris {
 	int size;
 } Iris;
 
-Iris* iris_read(const char* inputFile);
+Iris* iris_read(const char* input_file);
 void iris_print(Iris* iris);
 void iris_destroy(Iris* iris);
 

@@ -3,7 +3,7 @@
 
 #include "Defines.h"
 
-int net_connect(const char* IPaddr, int port);
+int net_connect(const char* IP, int port);
 int net_bind(int port);
 int net_accept(int port);
 

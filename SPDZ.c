@@ -1,16 +1,32 @@
 #include "SPDZ.h"
 #include "Common.h"
 #include "Communication.h"
-#include "Party.h"
 #include "Defines.h"
 #include "./structures/Iris.h"
 
-int debug_print = 10; // prints up to debug_print spdz_mult(s) information
+int debug_print = DEBUG_PRINTELEMS; // prints up to debug_print spdz_mult(s) info
+
+Party* party_create(int ID, int MACkey, int peer, TripleArray* tripleArray, RandArray* randArray, OpenValArray* openValArray) {
+    Party* res        = (Party*) malloc(sizeof(Party));
+    res->ID           = ID;
+    res->MACkey       = MACkey;
+    res->peer         = peer;
+    res->tripleArray  = tripleArray;
+    res->randArray    = randArray;
+    res->openValArray = openValArray;
+    return res;    
+}
+void party_destroy(Party* party) {
+    tripleArray_destroy(party->tripleArray);
+    randArray_destroy(party->randArray);
+    openValArray_destroy(party->openValArray);
+    free(party);
+}
 
 // mode: 0              -> will NOT save open values (ignores MAC_x and MAC_y also)
 // mode: MULT_SAVEOPEN  -> will save open values
 // Will return an int[2] res. res[0] -> value, res[1] -> MAC_value
-int* spdz_mult(int x, int y, int MAC_x, int MAC_y, Party* party, int mode) {
+int* spdz_mult(Party* party, int x, int y, int MAC_x, int MAC_y, int mode) {
     int* res = malloc(2*sizeof(int));
     int epsilonShare, deltaShare; // known
     int epsilon, delta;           // each party will know them after communication
@@ -38,7 +54,7 @@ int* spdz_mult(int x, int y, int MAC_x, int MAC_y, Party* party, int mode) {
         openValArray_insert(party->openValArray, delta, MAC_y-MAC_b);
     }
 
-    if (VERBOSE && debug_print<10) {
+    if (VERBOSE && debug_print<DEBUG_PRINTELEMS) {
         printf("Checking input: %d, %d\n", x, y);
         printf("Checking tripleShare: %d, %d, %d\n", a, b, c);
         printf("Checking epsilon-delta: %d, %d\n", epsilon, delta);
@@ -63,11 +79,11 @@ int* spdz_mult(int x, int y, int MAC_x, int MAC_y, Party* party, int mode) {
 // Also, it will require communication.
 // No open values will be saved here 
 // (check the documentation for additional info)
-void spdz_genIrisMACShares(Iris* iris, Party* party) {
+void spdz_genIrisMACShares(Party* party, Iris* iris) {
     int i;
     for (i=0; i<iris->size; i++) {
-        int* MAC_iriscode_struct = spdz_mult(iris->iriscode[i], party->MACkey, 0, 0, party, 0);
-        int* MAC_mask_struct     = spdz_mult(iris->mask[i], party->MACkey, 0, 0, party, 0);
+        int* MAC_iriscode_struct = spdz_mult(party, iris->iriscode[i], party->MACkey, 0, 0, 0);
+        int* MAC_mask_struct     = spdz_mult(party, iris->mask[i], party->MACkey, 0, 0, 0);
         iris->MAC_iriscode[i] = MAC_iriscode_struct[0];
         iris->MAC_mask[i]     = MAC_mask_struct[0];
         free(MAC_iriscode_struct);
@@ -75,13 +91,13 @@ void spdz_genIrisMACShares(Iris* iris, Party* party) {
     }
 }
 
-HammingDistance* spdz_hd(Iris* iris1, Iris* iris2, Party* party) {
+HammingDistance* spdz_hd(Party* party, Iris* iris1, Iris* iris2) {
     if (iris1->size!=iris2->size) {
         printf("Mismatching iris sizes. Skipping check.\n");
         return NULL;
     }
     if (VERBOSE) debug_print=0;
-    else debug_print=10;
+    else debug_print=DEBUG_PRINTELEMS;
 
     // Hamming distance
     int i;
@@ -101,8 +117,8 @@ HammingDistance* spdz_hd(Iris* iris1, Iris* iris2, Party* party) {
         int MAC_m1 = iris1->MAC_mask[i];
         int MAC_m2 = iris2->MAC_mask[i];
         // num += (f1+f2-2*f1*f2)*(1-(m1+m2-m1*m2));
-        int* f1f2_struct = spdz_mult(f1, f2, MAC_f1, MAC_f2, party, MULT_SAVEOPEN);
-        int* m1m2_struct = spdz_mult(m1, m2, MAC_m1, MAC_m2, party, MULT_SAVEOPEN);
+        int* f1f2_struct = spdz_mult(party, f1, f2, MAC_f1, MAC_f2, MULT_SAVEOPEN);
+        int* m1m2_struct = spdz_mult(party, m1, m2, MAC_m1, MAC_m2, MULT_SAVEOPEN);
 
         int f1f2 = f1f2_struct[0];
         int m1m2 = m1m2_struct[0];
@@ -114,7 +130,7 @@ HammingDistance* spdz_hd(Iris* iris1, Iris* iris2, Party* party) {
         int MAC_num1 = MAC_f1+MAC_f2-2*MAC_f1f2;
         int MAC_temp = -(MAC_m1+MAC_m2-MAC_m1m2);
 
-        int* num2_struct = spdz_mult(num1, temp, MAC_num1, MAC_temp, party, MULT_SAVEOPEN);
+        int* num2_struct = spdz_mult(party, num1, temp, MAC_num1, MAC_temp, MULT_SAVEOPEN);
         int num2 = num2_struct[0];
 
         num += num1+num2;
