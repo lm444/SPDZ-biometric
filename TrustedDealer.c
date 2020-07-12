@@ -4,23 +4,23 @@
 #include "./structures/TripleArray.h"
 #include "./structures/HammingDist.h"
 
-/* Every share will be structured in an array of two fields
-   arr[0] will be related to the Server
-   arr[1] will be related to the Client */
+/* every share will be structured in an array of two fields
+   arr[ID_SERVER] will be related to the Server
+   arr[ID_CLIENT] will be related to the Client */
 
 int MACkeyShares[2];
 TripleArray** TripleShares;
 
 int main() {
-    // Offline phase: will generate triples shares and MAC key shares before connections
+    // offline phase: will generate triples shares and MAC key shares before connections
     int ret;
 
     int MACkey = rand()%MAXVAL_MACKEY;
     printf("[TRUSTED DEALER] Generated MAC key: %d.\n", MACkey);
-    MACkeyShares[SERVER] = (MACkey-(rand()-RAND_MAX/2))%MAXVAL_MACKEY;
-    MACkeyShares[CLIENT] = MACkey-MACkeyShares[SERVER];
-    assert(MACkeyShares[SERVER]+MACkeyShares[CLIENT]==MACkey);
-    printf("[TRUSTED DEALER] Generated MAC shares: %d, %d.\n", MACkeyShares[SERVER], MACkeyShares[CLIENT]);
+    MACkeyShares[ID_SERVER] = (MACkey-(rand()-RAND_MAX/2))%MAXVAL_MACKEY;
+    MACkeyShares[ID_CLIENT] = MACkey-MACkeyShares[ID_SERVER];
+    assert(MACkeyShares[ID_SERVER]+MACkeyShares[ID_CLIENT]==MACkey);
+    printf("[TRUSTED DEALER] Generated MAC shares: %d, %d.\n", MACkeyShares[ID_SERVER], MACkeyShares[ID_CLIENT]);
 
     printf("[TRUSTED DEALER] Will now generate %d multiplicative triples...\n", MAX_TRIPLES);
     TripleArray* triples = tripleArray_create(MAX_TRIPLES);
@@ -39,14 +39,14 @@ int main() {
     printf("[TRUSTED DEALER] Inbound connection from Client\n");
 
     printf("[TRUSTED DEALER] Sending now MAC key shares...\n");
-    net_sendMACkeyShare(MACkeyShares[SERVER], server_desc);
-    net_sendMACkeyShare(MACkeyShares[CLIENT], client_desc);
+    net_sendInt(MACkeyShares[ID_SERVER], server_desc);
+    net_sendInt(MACkeyShares[ID_CLIENT], client_desc);
     printf("[TRUSTED DEALER] Sent MAC key shares.\n");
 
     printf("[TRUSTED DEALER] Sending now multiplicative triples key shares...\n");
-    ret=tripleArray_send(TripleShares[SERVER], MAX_TRIPLES, server_desc);
+    ret=tripleArray_send(TripleShares[ID_SERVER], MAX_TRIPLES, server_desc);
     printf("[TRUSTED DEALER] Sent %d multiplicative triples to Server.\n", ret);
-    ret=tripleArray_send(TripleShares[CLIENT], MAX_TRIPLES, client_desc);
+    ret=tripleArray_send(TripleShares[ID_CLIENT], MAX_TRIPLES, client_desc);
     printf("[TRUSTED DEALER] Sent %d multiplicative triples to Client.\n", ret);
 
     // Client and Server has to generate the same random vector.
@@ -55,8 +55,8 @@ int main() {
     net_sendInt(seed, server_desc);
     net_sendInt(seed, client_desc);
     
-    tripleArray_destroy(TripleShares[SERVER]);
-    tripleArray_destroy(TripleShares[CLIENT]);
+    tripleArray_destroy(TripleShares[ID_SERVER]);
+    tripleArray_destroy(TripleShares[ID_CLIENT]);
     free(TripleShares);
 
     if (DEBUG) {

@@ -20,17 +20,17 @@ Party* server;
 int client_desc, socket_desc, dealer_desc;
 
 void testServerFunctionalities() {
-	// Testing Iris receiving here
+	// testing Iris recv here
 	Iris* iris = iris_recv(client_desc);
 	if (VERBOSE==2) iris_print(iris);
 		
-	// Reading Iris from file; the same sent from Client at the moment
-	Iris* iris2 = iris_read(IRIS_SERVER);
+	// reading Iris from file; the same sent from Client at the moment
+	Iris* iris2 = iris_read(DEBUG_IRIS_SERVER);
 	if (iris->size!=iris2->size) {
 		printf("Mismatching sizes. Terminating... "); exit(1);
 	}
 		
-	// Checking the two Irises are indeed the same and well represented
+	// checking the two Irises are indeed the same and well represented
 	int i;
 	for (i=0; i<iris->size; i++) {
 		if (iris->mask[i]!=iris2->mask[i]) {
@@ -43,31 +43,36 @@ void testServerFunctionalities() {
 	printf("Communication was successful.\n");
 
 	printf("Generating shares of iris...\n");
-	Iris** shares = genIrisShares(iris);
-	if (VERBOSE==2) printShares(shares);
+	Iris** shares = iris_genShares(iris);
+	if (VERBOSE==2) {
+		iris_print(shares[0]);
+		iris_print(shares[1]);
+	}
 
-	// Checking Hamming Distance between Irises (here: same iris)
+	// checking Hamming Distance between Irises (here: same iris)
 	printf("Now will try authentication check between two same irises...\n");
 	debug_hd(iris, iris2);
 
-	// Arbitrary Iris modification
+	// arbitrary Iris modification
 	for (i=0; i<iris->size; i++) iris->iriscode[i]=1;
 
 	printf("Authentication check after arbitrarily modifying one of the two irises...\n");
 	debug_hd(iris, iris2);
 
-	destroyShares(shares);
+	iris_destroy(shares[0]); 
+	iris_destroy(shares[1]); 
+	free(shares);
 	iris_destroy(iris);
 	iris_destroy(iris2);
 	exit(0);
 }
 
-// debug ONLY with IRIS_SERVER and IRIS_CLIENT.
+// debug ONLY with DEBUG_IRIS_SERVER and DEBUG_IRIS_CLIENT.
 void testSPDZ() {
 	int i;
-	Iris* clientIrisClear = iris_read(IRIS_CLIENT); // for operation check purposes only
-	Iris* serverIrisClear = iris_read(IRIS_SERVER);		
-	Iris** shares = genIrisShares(serverIrisClear);
+	Iris* clientIrisClear = iris_read(DEBUG_IRIS_CLIENT); // for operation check purposes only
+	Iris* serverIrisClear = iris_read(DEBUG_IRIS_SERVER);		
+	Iris** shares = iris_genShares(serverIrisClear);
 
 	Iris* serverIris = shares[0];
 	iris_send(shares[1], client_desc);
@@ -83,7 +88,7 @@ void testSPDZ() {
 		assert(clientOtherShares->mask[i]+clientSelfShares->mask[i]==clientIrisClear->mask[i]);
 	}
 
-	server = party_create(SERVER, MACkeyShare, client_desc, tripleArray, randArray, openValArray);
+	server = party_create(ID_SERVER, MACkeyShare, client_desc, tripleArray, randArray, openValArray);
 
 	printf("[SERVER] Printing server iris before MAC is populated...\n");
 	iris_print(serverIris);
@@ -106,22 +111,24 @@ void testSPDZ() {
 	hd_destroy(hd_clear);
 	hd_destroy(hd_share);
 	iris_destroy(serverIrisClear);
-	iris_destroy(clientIrisClear); // TEMP
-	destroyShares(shares); 	      // will also destroy serverIris!
+	iris_destroy(clientIrisClear);
+	iris_destroy(shares[0]); 
+	iris_destroy(shares[1]); 
+	free(shares);
 	iris_destroy(clientSelfShares);
 	iris_destroy(clientOtherShares);
 }
 
 void protocol() {
 	Iris* serverIrisClear = iris_read(iris_server);		
-	Iris** shares = genIrisShares(serverIrisClear);
+	Iris** shares = iris_genShares(serverIrisClear);
 
 	Iris* serverIris = shares[0];
 	iris_send(shares[1], client_desc);
 
 	Iris* clientIris = iris_recv(client_desc);
 
-	server = party_create(SERVER, MACkeyShare, client_desc, tripleArray, randArray, openValArray);
+	server = party_create(ID_SERVER, MACkeyShare, client_desc, tripleArray, randArray, openValArray);
 
 	printf("[SERVER] Populating server iris' MAC ...\n");
 	spdz_genIrisMACShares(server, serverIris);
@@ -135,7 +142,9 @@ void protocol() {
 	hd_destroy(hd_other);
 	hd_destroy(hd_share);
 	iris_destroy(serverIrisClear);
-	destroyShares(shares); 	      // will also destroy serverIris!
+	iris_destroy(shares[0]); 
+	iris_destroy(shares[1]); 
+	free(shares);
 	iris_destroy(clientIris);
 }
 
@@ -153,7 +162,7 @@ int main(int argc, char** argv) {
 	client_desc = net_accept(socket_desc);
 	
 	// TD will send both the MAC key share and triples shares
-	MACkeyShare=net_recvMACkeyShare(dealer_desc);
+	MACkeyShare=net_recvInt(dealer_desc);
 	printf("[SERVER] Received MACkeyShare: %d\n", MACkeyShare);
 
 	tripleArray=tripleArray_recv(dealer_desc);
@@ -174,7 +183,7 @@ int main(int argc, char** argv) {
 	
 	// if (DEBUG) testServerFunctionalities();
 	
-	// Same as Client
+	// same as Client
 	if (DEBUG) testSPDZ();
 	else protocol();
 

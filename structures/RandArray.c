@@ -9,22 +9,15 @@ RandArray* randArray_create(int size) {
     return res;
 }
 
+void randArray_destroy(RandArray* arr) {
+    free(arr->values);
+    free(arr);
+}
+
 void randArray_populate(RandArray* arr, int seed) {
     int i;
     srand(seed);
     for (i=0; i<arr->size; i++) arr->values[i]=rand()%MAXVAL_RANDARR;
-}
-
-int* randArray_consume(RandArray* arr, int count) {
-    if (arr->nextAvailable+count > arr->size) {
-        printf("Out of bounds.\n");
-        exit(1);
-    }
-    int* res           = arr->values+arr->nextAvailable;
-    arr->nextAvailable = (arr->nextAvailable+count)%arr->size;
-    if (VERBOSE && count>1) printf("Consumed %d rand(s).\n", count);
-    else if (VERBOSE==2) printf("Consumed %d rand(s).\n", count);
-    return res;
 }
 
 void randArray_print(RandArray* arr) {
@@ -40,9 +33,4 @@ void randArray_print(RandArray* arr) {
             reverse--;
         }
 	}
-}
-
-void randArray_destroy(RandArray* arr) {
-    free(arr->values);
-    free(arr);
 }

@@ -20,7 +20,7 @@ Party* client;
 int server_desc, dealer_desc;
 
 void testClientFunctionalities() {
-	Iris* iris = iris_read(IRIS_CLIENT);
+	Iris* iris = iris_read(DEBUG_IRIS_CLIENT);
 	if (VERBOSE==2) iris_print(iris);
 
 	iris_send(iris, server_desc);
@@ -28,13 +28,13 @@ void testClientFunctionalities() {
 	exit(0);
 }
 
-// debug ONLY with IRIS_SERVER and IRIS_CLIENT.
+// debug ONLY with DEBUG_IRIS_SERVER and DEBUG_IRIS_CLIENT.
 void testSPDZ() {
 	int i;
-	Iris* serverIrisClear = iris_read(IRIS_SERVER);		// for operation check purposes only
+	Iris* serverIrisClear = iris_read(DEBUG_IRIS_SERVER);		// for operation check purposes only
 
-	Iris* clientIrisClear = iris_read(IRIS_CLIENT);
-	Iris** shares = genIrisShares(clientIrisClear);
+	Iris* clientIrisClear = iris_read(DEBUG_IRIS_CLIENT);
+	Iris** shares = iris_genShares(clientIrisClear);
 
 	Iris* clientIris = shares[0];
 	iris_send(shares[1], server_desc);
@@ -49,7 +49,7 @@ void testSPDZ() {
 		assert(serverOtherShares->mask[i]+serverSelfShares->mask[i]==serverIrisClear->mask[i]);
 	}
 
-	client = party_create(CLIENT, MACkeyShare, server_desc, tripleArray, randArray, openValArray);
+	client = party_create(ID_CLIENT, MACkeyShare, server_desc, tripleArray, randArray, openValArray);
 
 	printf("[CLIENT] Printing server iris before MAC is populated...\n");
 	iris_print(serverOtherShares);
@@ -73,7 +73,9 @@ void testSPDZ() {
 	hd_destroy(hd_share);
 	iris_destroy(clientIrisClear);
 	iris_destroy(serverIrisClear); 
-	destroyShares(shares); 	       // will also destroy clientIris!
+	iris_destroy(shares[0]); 
+	iris_destroy(shares[1]); 
+	free(shares);
 	iris_destroy(serverOtherShares); 
 	iris_destroy(serverSelfShares);
 }
@@ -81,16 +83,16 @@ void testSPDZ() {
 void protocol() {
 	/* clientIris will be the shares of the Client's iris 
 	   serverIris will be the shares of the Server's iris 
-	   We will operate on those two for SPDZ; clientIrisClear won't be used */
+	   we will operate on those two for SPDZ; clientIrisClear won't be used */
 	   
 	Iris* clientIrisClear = iris_read(iris_client);
-	Iris** shares = genIrisShares(clientIrisClear);
+	Iris** shares = iris_genShares(clientIrisClear);
 
 	Iris* clientIris = shares[0];
 	iris_send(shares[1], server_desc);
 
 	Iris* serverIris = iris_recv(server_desc);
-	client = party_create(CLIENT, MACkeyShare, server_desc, tripleArray, randArray, openValArray);
+	client = party_create(ID_CLIENT, MACkeyShare, server_desc, tripleArray, randArray, openValArray);
 
 	printf("[CLIENT] Populating server iris' MAC...\n");
 	spdz_genIrisMACShares(client, serverIris);
@@ -105,7 +107,9 @@ void protocol() {
 	hd_destroy(hd_other);
 	hd_destroy(hd_share);
 	iris_destroy(clientIrisClear);
-	destroyShares(shares); 	      // will also destroy clientIris!
+	iris_destroy(shares[0]); 
+	iris_destroy(shares[1]); 
+	free(shares);
 	iris_destroy(serverIris); 
 }
 
@@ -123,7 +127,7 @@ int main(int argc, char** argv) {
 	dealer_desc=net_connect(DEALER_ADDR, DEALER_PORT);
 	printf("[CLIENT] Connection to Dealer was successful.\n");
 
-	MACkeyShare=net_recvMACkeyShare(dealer_desc);
+	MACkeyShare=net_recvInt(dealer_desc);
 	printf("[CLIENT] Received MACkeyShare: %d\n", MACkeyShare);
 
 	tripleArray=tripleArray_recv(dealer_desc);

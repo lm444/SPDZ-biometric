@@ -15,6 +15,15 @@ Iris* iris_create(int size) {
 	return res;
 }
 
+void iris_destroy(Iris* iris) {
+	if (VERBOSE) printf("Freeing iris %p\n", iris);
+	free(iris->iriscode);
+	free(iris->mask);
+	free(iris->MAC_iriscode);
+	free(iris->MAC_mask);
+	free(iris);
+}
+
 Iris* iris_read(const char* input_file) {    
 	int fd, ret, size;
 
@@ -28,26 +37,27 @@ Iris* iris_read(const char* input_file) {
 
 	Iris* res = iris_create(size);
 
-	// This read will populate the iriscode.
+	// this read will populate the iriscode.
 	/* POSSIBLE OPTIMIZATION: One single read on a char* buf, then populate the iriscode
 	   That's to avoid single-byte accesses to disk. Also, a bit more readable code. */
-	// TODO: Check for failures on read
 
 	int readBytes=0;
 	while (readBytes<(res->size)) {
 		char c;
 		ret = read(fd, &c, 1);
+		if (ret<0 && errno==EINTR) continue;
 		if (ret<0) handle_error("[IRIS] Error reading");
 		res->iriscode[readBytes] = c - '0';
 		readBytes++;
 	}
 
-	// Same as before, but for the mask.
+	// same as before, but for the mask.
 	
 	readBytes=0;
 	while (readBytes<(res->size)) {
 		char c;
 		ret = read(fd, &c, 1);
+		if (ret<0 && errno==EINTR) continue;
 		if (ret<0) handle_error("[IRIS] Error reading");
 		res->mask[readBytes] = c - '0';
 		readBytes++;
@@ -73,19 +83,10 @@ void iris_print(Iris* iris) {
 	printf("\n");
 }
 
-void iris_destroy(Iris* iris) {
-	if (VERBOSE) printf("Freeing iris %p\n", iris);
-	free(iris->iriscode);
-	free(iris->mask);
-	free(iris->MAC_iriscode);
-	free(iris->MAC_mask);
-	free(iris);
-}
+// returns an array of two Irises containing the respective shares
+// shares will be generated inside the interval (-MAXVAL_IRISCODE-1, MAXVAL_IRISCODE)
 
-// Will return an array of two Irises containing the respective shares
-// Shares will be generated inside the interval (-MAXVAL_IRISCODE-1, MAXVAL_IRISCODE)
-
-Iris** genIrisShares(Iris* iris) {
+Iris** iris_genShares(Iris* iris) {
 	int i;
 	Iris** res = malloc(2*sizeof(Iris*));
 	res[0] = iris_create(iris->size);
@@ -114,28 +115,11 @@ Iris** genIrisShares(Iris* iris) {
 	return res;
 }
 
-void printShares(Iris** shares) {
-	int i;
-	printf("Printing shares %p\n", shares);
-	printf("iriscode\n");
-	for (i=0; i<shares[0]->size; i++) printf("Share0[%d]=%d; Share1[%d]=%d\n", i, shares[0]->iriscode[i], i, shares[1]->iriscode[i]);
-	printf("mask\n");
-	for (i=0; i<shares[0]->size; i++) printf("Share0[%d]=%d; Share1[%d]=%d\n", i, shares[0]->mask[i], i, shares[1]->mask[i]);
-	printf("\n");
-}
-
-void destroyShares(Iris** shares) {
-	if (VERBOSE) printf("Freeing shares %p\n", shares);
-	iris_destroy(shares[0]);
-	iris_destroy(shares[1]);
-	free(shares);
-}
-
-/* At this stage the iris has already been parsed correctly.
+/* at this stage the iris has already been parsed correctly.
    Communication protocol in two phases:
    - first, the size of the iris is sent;
    - then, both the iriscode and the mask are sent.
-   Receives will happen in the same order. */
+   receives will happen in the same order. */
 
 void iris_send(Iris* iris, int to) {
     net_send(to, &iris->size, sizeof(int), 0);

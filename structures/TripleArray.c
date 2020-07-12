@@ -47,7 +47,7 @@ Triple* tripleArray_consume(TripleArray* arr, int count) {
     return res;
 }
 
-// If VERBOSE==2 will print all the triples
+// if VERBOSE==2 will print all the triples
 // else will print the first and the last DEBUG_ELEMS elems
 void tripleArray_print(TripleArray* arr) {
 	int i, max=DEBUG_PRINTELEMS;
@@ -73,14 +73,14 @@ TripleArray** tripleArray_genShares(TripleArray* arr) {
 
     TripleArray** res = (TripleArray**) malloc(2*sizeof(Triple*));
 
-    res[SERVER] = tripleArray_create(arr->size);
-    res[CLIENT] = tripleArray_create(arr->size);
+    res[ID_SERVER] = tripleArray_create(arr->size);
+    res[ID_CLIENT] = tripleArray_create(arr->size);
 
-    // Will compact a bit references.
+    // will compact a bit references.
 
     Triple* triples      = arr->triples;
-    Triple* serverShares = res[SERVER]->triples;
-    Triple* clientShares = res[CLIENT]->triples;
+    Triple* serverShares = res[ID_SERVER]->triples;
+    Triple* clientShares = res[ID_CLIENT]->triples;
     int numTriples       = arr->size;
     
     for (i=0; i<numTriples; i++) {
@@ -109,9 +109,9 @@ TripleArray** tripleArray_genShares(TripleArray* arr) {
         clientShares[i].MAC_c = randMAC_c;
     }
 
-    // Generic checks over generation of triples or prints. 
-    // The loop will run if either DEBUG or VERBOSE is not zero.
-    // Will not check by default since it would weigh down computation.
+    // generic checks over generation of triples or prints.
+    // the loop will run if either DEBUG or VERBOSE is not zero.
+    // will not check by default since it would weigh down computation.
 
     if (DEBUG|VERBOSE) {
         int printTriples;
@@ -159,8 +159,8 @@ TripleArray** tripleArray_genShares(TripleArray* arr) {
     return res;
 }
 
-// Will send only the actual triples.
-// Other fields will be reconstructed by the recipient.
+// will send only the actual triples.
+// other fields will be reconstructed by the recipient.
 int tripleArray_send(TripleArray* arr, int numTriples, int to) {
     int ret;
     Triple* triples = tripleArray_consume(arr, numTriples);

@@ -15,12 +15,6 @@
 
 #include "Defines.h"
 
-#define IRIS_CLIENT "irisClient.txt"
-#define IRIS_SERVER "irisServer.txt"
-
-#define SERVER 0
-#define CLIENT 1
-
 void handle_error(const char* msg);
 int check_features(int n);
 

@@ -11,7 +11,6 @@ typedef struct RandArray {
 
 RandArray* randArray_create(int size);
 void randArray_populate(RandArray* arr, int seed);
-int* randArray_consume(RandArray* arr, int numRands);
 void randArray_print(RandArray* arr);
 void randArray_destroy(RandArray* arr);
 

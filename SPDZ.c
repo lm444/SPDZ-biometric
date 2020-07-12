@@ -63,7 +63,7 @@ int* spdz_mult(Party* party, int x, int y, int MAC_x, int MAC_y, int mode) {
     }
 
     // only SERVER adds the constant epsilon*delta
-    if (party->ID==SERVER) {
+    if (party->ID==ID_SERVER) {
         res[0] = c + b*epsilon + a*delta + epsilon*delta;
         res[1] = MAC_c + MAC_b*epsilon + MAC_a*delta + party->MACkey*epsilon*delta;
     }
@@ -99,12 +99,12 @@ HammingDistance* spdz_hd(Party* party, Iris* iris1, Iris* iris2) {
     if (VERBOSE) debug_print=0;
     else debug_print=DEBUG_PRINTELEMS;
 
-    // Hamming distance
+    // Hamming distance, in SPDZ
     int i;
     int num=0, den;
 
     // only SERVER the constant N in the denominator
-    if (party->ID==SERVER) den=iris1->size;
+    if (party->ID==ID_SERVER) den=iris1->size;
     else den=0;
 
     for (i=0; i<iris1->size; i++) { 
@@ -145,26 +145,37 @@ HammingDistance* spdz_hd(Party* party, Iris* iris1, Iris* iris2) {
     return res;
 }
 
-// Dealer will check the result by summing the sigma_i values.
-// Returns the share of the Hamming distance of the peer 
+// dealer will check the result by summing the sigma_i values.
+// returns the share of the Hamming distance of the peer 
 // if no corruption was detected; else will terminate.
 HammingDistance* spdz_MACCheck(Party* party, int dealer, HammingDistance* hd) {
     int i;
     int a=0, gamma_i=0, sigma_i;
 
     // simplyfing references
-    int numVals       = party->openValArray->nextFree;
     int* openVals     = party->openValArray->values;
     int* randVals     = party->randArray->values;
     int* openVals_MAC = party->openValArray->MAC_values;
     int MACkey        = party->MACkey;
 
+    // consumes numVals open values and random values
+    // starting from openVals[start], randVals[start]
+    int numVals       = party->openValArray->nextFree - party->openValArray->nextAvailable;
+    int start         = party->openValArray->nextAvailable;
+
     printf("Batch checking all %d open values.\n", numVals);
-    for (i=0; i<numVals; i++) a+=openVals[i]*randVals[i];
-    for (i=0; i<numVals; i++) {
+    for (i=start; i<numVals; i++) {
+        // calculating a
+        a += openVals[i]*randVals[i];
+
+        // calculating gamma_i
         int gamma_aj_i = openVals_MAC[i];
         gamma_i       += gamma_aj_i*randVals[i];
     }
+    // updating counters
+    party->openValArray->nextAvailable += party->openValArray->nextFree;
+    party->randArray->nextAvailable    += party->openValArray->nextFree;
+
     sigma_i = gamma_i - a*MACkey;
 
     // Committing both the Hamming distance and the sigma_i

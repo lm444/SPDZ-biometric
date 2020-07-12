@@ -17,18 +17,6 @@ void iris_destroy(Iris* iris);
 void iris_send(Iris* iris, int to);
 Iris* iris_recv(int from);
 
-/*
-typedef struct IrisSharesStruct {
-	Iris* shareSelf;
-	Iris* shareOther;
-} IrisShares;
-*/
-
-/* An additional structure might help in readability;
-   the following methods would refer to it. */
-
-Iris** genIrisShares(Iris* iris);
-void printShares(Iris** shares);
-void destroyShares(Iris** shares);
+Iris** iris_genShares(Iris* iris);
 
 #endif

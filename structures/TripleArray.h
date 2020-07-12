@@ -26,4 +26,5 @@ int tripleArray_send(TripleArray* arr, int numTriples, int to);
 TripleArray* tripleArray_recv(int from);
 
 TripleArray** tripleArray_genShares(TripleArray* arr);
+
 #endif

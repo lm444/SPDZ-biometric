@@ -1,6 +1,6 @@
 #include "Common.h"
 
-// Communication wrappers
+// communication wrappers
 int net_bind(int port) {
     int ret, socket_desc;
 
@@ -93,22 +93,12 @@ int net_recv(int from, void* buf, int size, int flags) {
 
 // Application-specific methods
 
-void net_sendInt(int share, int to) {
-    net_send(to, &share, sizeof(int), 0);
+void net_sendInt(int val, int to) {
+    net_send(to, &val, sizeof(int), 0);
 }
 
 int net_recvInt(int from) {
     int res;
     net_recv(from, &res, sizeof(int), 0);
     return res;
-}
-
-// Detached from the generic sendIntShare to simplify modification
-// for a different representation of the MAC key (e.g. uint64)
-void net_sendMACkeyShare(int MACkeyShare, int to) {
-    net_sendInt(MACkeyShare, to);
-}
-
-int net_recvMACkeyShare(int from) {
-    return net_recvInt(from);
 }

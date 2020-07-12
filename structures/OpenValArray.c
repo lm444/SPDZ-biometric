@@ -11,6 +11,12 @@ OpenValArray* openValArray_create(int size) {
     return res;
 }
 
+void openValArray_destroy(OpenValArray* arr) {
+    free(arr->values);
+    free(arr->MAC_values);
+    free(arr);
+}
+
 void openValArray_insert(OpenValArray* arr, int val, int MAC_val) {
     if (arr->nextFree >= arr->size) {
         printf("Out of bounds.\n");
@@ -19,19 +25,6 @@ void openValArray_insert(OpenValArray* arr, int val, int MAC_val) {
     arr->values[arr->nextFree]     = val;
     arr->MAC_values[arr->nextFree] = MAC_val;
     arr->nextFree++;
-}
-
-// consumes count elements in the array
-int* openValArray_consume(OpenValArray* arr, int count) {
-    if (arr->nextAvailable+count > arr->size) {
-        printf("Out of bounds.\n");
-        exit(1);
-    }
-    int* res            = arr->values+arr->nextAvailable;
-    arr->nextAvailable += count;
-    if (VERBOSE && count>1) printf("Consumed %d open values(s).\n", count);
-    else if (VERBOSE==2) printf("Consumed %d open values(s).\n", count);
-    return res;
 }
 
 void openValArray_print(OpenValArray* arr) {
@@ -50,10 +43,4 @@ void openValArray_print(OpenValArray* arr) {
             reverse--;
         }
 	}
-}
-
-void openValArray_destroy(OpenValArray* arr) {
-    free(arr->values);
-    free(arr->MAC_values);
-    free(arr);
 }
