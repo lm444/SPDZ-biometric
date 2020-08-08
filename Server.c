@@ -90,16 +90,28 @@ void testSPDZ() {
 
 	server = party_create(ID_SERVER, MACkeyShare, client_desc, tripleArray, randArray, openValArray);
 
-	printf("[SERVER] Printing server iris before MAC is populated...\n");
-	iris_print(serverIris);
-	spdz_genIrisMACShares(server, serverIris);
-	printf("[SERVER] Printing server iris after MAC is populated...\n");
-	iris_print(serverIris);
-	printf("[SERVER] Printing client iris before MAC is populated...\n");
-	iris_print(clientOtherShares);
+
+	if (VERBOSE) {
+		printf("[SERVER] Printing client iris before MAC is populated...\n");
+		iris_print(clientOtherShares);
+	}
+
 	spdz_genIrisMACShares(server, clientOtherShares);
-	printf("[SERVER] Printing server iris after MAC is populated...\n");
-	iris_print(clientOtherShares);
+
+	if (VERBOSE) {
+		printf("[SERVER] Printing client iris after MAC is populated...\n");
+		iris_print(clientOtherShares);
+
+		printf("[SERVER] Printing server iris before MAC is populated...\n");
+		iris_print(serverIris);
+	}
+
+	spdz_genIrisMACShares(server, serverIris);
+
+	if (VERBOSE) {
+		printf("[SERVER] Printing server iris after MAC is populated...\n");
+		iris_print(serverIris);
+	}
 
 	HammingDistance* hd_clear = debug_hd(serverIrisClear, clientIrisClear);
 	hd_send(hd_clear, dealer_desc);
@@ -130,10 +142,10 @@ void protocol() {
 
 	server = party_create(ID_SERVER, MACkeyShare, client_desc, tripleArray, randArray, openValArray);
 
-	printf("[SERVER] Populating server iris' MAC ...\n");
-	spdz_genIrisMACShares(server, serverIris);
 	printf("[SERVER] Populating client iris' MAC...\n");
 	spdz_genIrisMACShares(server, clientIris);
+	printf("[SERVER] Populating server iris' MAC ...\n");
+	spdz_genIrisMACShares(server, serverIris);
 
 	HammingDistance* hd_share = spdz_hd(server, serverIris, clientIris);
 	HammingDistance* hd_other = spdz_MACCheck(server, dealer_desc, hd_share);
@@ -149,12 +161,13 @@ void protocol() {
 }
 
 int main(int argc, char** argv) {
-	if (argc<2) {
-		printf("usage: ./server <irisfile>\n");
-		exit(1);
+	if (!DEBUG) {
+		if (argc<2) {
+			printf("usage: ./server <irisfile>\n");
+			exit(1);
+		}
+		iris_server = conv_if(argv[1]);
 	}
-
-	iris_server = conv_if(argv[1]);
 
 	socket_desc = net_bind(SERVER_PORT);
 	dealer_desc	= net_connect(DEALER_ADDR, DEALER_PORT);

@@ -22,6 +22,9 @@ int main() {
     assert(MACkeyShares[ID_SERVER]+MACkeyShares[ID_CLIENT]==MACkey);
     printf("[TRUSTED DEALER] Generated MAC shares: %d, %d.\n", MACkeyShares[ID_SERVER], MACkeyShares[ID_CLIENT]);
 
+    int seed = rand();
+    printf("[TRUSTED DEALER] Generated seed: %d\n", seed);
+
     printf("[TRUSTED DEALER] Will now generate %d multiplicative triples...\n", MAX_TRIPLES);
     TripleArray* triples = tripleArray_create(MAX_TRIPLES);
     tripleArray_populate(triples, MACkey);
@@ -49,8 +52,7 @@ int main() {
     ret=tripleArray_send(TripleShares[ID_CLIENT], MAX_TRIPLES, client_desc);
     printf("[TRUSTED DEALER] Sent %d multiplicative triples to Client.\n", ret);
 
-    // Client and Server has to generate the same random vector.
-    int seed = rand();
+    // Client and Server have to generate the same random vector.
     printf("[TRUSTED DEALER] Sending seed %d for the random value generation (for MAC check).\n", seed);
     net_sendInt(seed, server_desc);
     net_sendInt(seed, client_desc);

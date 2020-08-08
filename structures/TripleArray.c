@@ -56,11 +56,11 @@ void tripleArray_print(TripleArray* arr) {
     Triple* triples = arr->triples;
 
 	for (i=0; i<max; i++) {
-		printf("Triple[%d] = %d %d %d\n", i, triples[i].a, triples[i].b, triples[i].c);
-        printf("TripleMAC[%d] = %d %d %d\n", i, triples[i].MAC_a, triples[i].MAC_b, triples[i].MAC_c);
+		printf("Triple[%d] = (%d, %d, %d)\n", i, triples[i].a, triples[i].b, triples[i].c);
+        printf("TripleMAC[%d] = (%d, %d, %d)\n", i, triples[i].MAC_a, triples[i].MAC_b, triples[i].MAC_c);
 		if (VERBOSE<2) {
-            printf("Triple[%d] = %d %d %d\n", reverse, triples[reverse].a, triples[reverse].b, triples[reverse].c);
-            printf("TripleMAC[%d] = %d %d %d\n", reverse, triples[reverse].MAC_a, triples[reverse].MAC_b, triples[reverse].MAC_c);
+            printf("Triple[%d] = (%d, %d, %d)\n", reverse, triples[reverse].a, triples[reverse].b, triples[reverse].c);
+            printf("TripleMAC[%d] = (%d, %d, %d)\n", reverse, triples[reverse].MAC_a, triples[reverse].MAC_b, triples[reverse].MAC_c);
             reverse--;
         }
 	}
@@ -119,24 +119,24 @@ TripleArray** tripleArray_genShares(TripleArray* arr) {
         else if (VERBOSE==2) printTriples=numTriples;
         for (i=0; i<numTriples; i++) {
             if (VERBOSE==1 && i<printTriples) {
-                printf("TripleShares[SERVER][%d] = %d, %d, %d", i, serverShares[i].a, serverShares[i].b, serverShares[i].c);
+                printf("TripleShares[SERVER][%d] = (%d, %d, %d)", i, serverShares[i].a, serverShares[i].b, serverShares[i].c);
                 printf("\n");
-                printf("MAC[SERVER][%d] = %d, %d, %d", i, serverShares[i].MAC_a, serverShares[i].MAC_b, serverShares[i].MAC_c);
+                printf("MAC[SERVER][%d] = (%d, %d, %d)", i, serverShares[i].MAC_a, serverShares[i].MAC_b, serverShares[i].MAC_c);
                 printf("\n");
-                printf("TripleShares[CLIENT][%d] = %d, %d, %d", i, clientShares[i].a, clientShares[i].b, clientShares[i].c);
+                printf("TripleShares[CLIENT][%d] = (%d, %d, %d)", i, clientShares[i].a, clientShares[i].b, clientShares[i].c);
                 printf("\n");
-                printf("MAC[CLIENT][%d] = %d, %d, %d", i, clientShares[i].MAC_a, clientShares[i].MAC_b, clientShares[i].MAC_c);
+                printf("MAC[CLIENT][%d] = (%d, %d, %d)", i, clientShares[i].MAC_a, clientShares[i].MAC_b, clientShares[i].MAC_c);
                 printf("\n");
 
             }
             else if (VERBOSE==2) {
-                printf("TripleShares[SERVER][%d] = %d, %d, %d", i, serverShares[i].a, serverShares[i].b, serverShares[i].c);
+                printf("TripleShares[SERVER][%d] = (%d, %d, %d)", i, serverShares[i].a, serverShares[i].b, serverShares[i].c);
                 printf("\n");
-                printf("MAC[SERVER][%d] = %d, %d, %d", i, serverShares[i].MAC_a, serverShares[i].MAC_b, serverShares[i].MAC_c);
+                printf("MAC[SERVER][%d] = (%d, %d, %d)", i, serverShares[i].MAC_a, serverShares[i].MAC_b, serverShares[i].MAC_c);
                 printf("\n");
-                printf("TripleShares[CLIENT][%d] = %d, %d, %d", i, clientShares[i].a, clientShares[i].b, clientShares[i].c);
+                printf("TripleShares[CLIENT][%d] = (%d, %d, %d)", i, clientShares[i].a, clientShares[i].b, clientShares[i].c);
                 printf("\n");
-                printf("MAC[CLIENT][%d] = %d, %d, %d", i, clientShares[i].MAC_a, clientShares[i].MAC_b, clientShares[i].MAC_c);
+                printf("MAC[CLIENT][%d] = (%d, %d, %d)", i, clientShares[i].MAC_a, clientShares[i].MAC_b, clientShares[i].MAC_c);
                 printf("\n");
             }
             if (DEBUG) {

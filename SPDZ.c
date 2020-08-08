@@ -55,11 +55,11 @@ int* spdz_mult(Party* party, int x, int y, int MAC_x, int MAC_y, int mode) {
     }
 
     if (VERBOSE && debug_print<DEBUG_PRINTELEMS) {
-        printf("Checking input: %d, %d\n", x, y);
-        printf("Checking tripleShare: %d, %d, %d\n", a, b, c);
-        printf("Checking epsilon-delta: %d, %d\n", epsilon, delta);
-        printf("Checking output (without +e-d): %d\n", c + b*epsilon + a*delta);
-        debug_print++;
+        printf("Input: (%d, %d)\n", x, y);
+        printf("Triple: (%d, %d, %d)\n", a, b, c);
+        printf("Open values (epsilon, delta): (%d, %d)\n", epsilon, delta); // sanity check
+        if (party->ID==ID_SERVER) printf("Server output: %d\n", c + b*epsilon + a*delta + epsilon*delta);
+        else printf("Client output: %d\n", c + b*epsilon + a*delta);
     }
 
     // only SERVER adds the constant epsilon*delta
@@ -81,6 +81,7 @@ int* spdz_mult(Party* party, int x, int y, int MAC_x, int MAC_y, int mode) {
 // (check the documentation for additional info)
 void spdz_genIrisMACShares(Party* party, Iris* iris) {
     int i;
+    if (VERBOSE) debug_print=0;
     for (i=0; i<iris->size; i++) {
         int* MAC_iriscode_struct = spdz_mult(party, iris->iriscode[i], party->MACkey, 0, 0, 0);
         int* MAC_mask_struct     = spdz_mult(party, iris->mask[i], party->MACkey, 0, 0, 0);
@@ -88,7 +89,9 @@ void spdz_genIrisMACShares(Party* party, Iris* iris) {
         iris->MAC_mask[i]     = MAC_mask_struct[0];
         free(MAC_iriscode_struct);
         free(MAC_mask_struct);
+        debug_print++;
     }
+    if (VERBOSE) printf("\n");
 }
 
 HammingDistance* spdz_hd(Party* party, Iris* iris1, Iris* iris2) {
@@ -116,8 +119,10 @@ HammingDistance* spdz_hd(Party* party, Iris* iris1, Iris* iris2) {
         int MAC_f2 = iris2->MAC_iriscode[i];
         int MAC_m1 = iris1->MAC_mask[i];
         int MAC_m2 = iris2->MAC_mask[i];
-        // num += (f1+f2-2*f1*f2)*(1-(m1+m2-m1*m2));
+        
+        if (VERBOSE) printf("[SPDZ_HD] Calculating F1F2 of feature %d.\n", i);
         int* f1f2_struct = spdz_mult(party, f1, f2, MAC_f1, MAC_f2, MULT_SAVEOPEN);
+        if (VERBOSE) printf("[SPDZ_HD] Calculating M1M2 of feature %d.\n", i);
         int* m1m2_struct = spdz_mult(party, m1, m2, MAC_m1, MAC_m2, MULT_SAVEOPEN);
 
         int f1f2 = f1f2_struct[0];
@@ -126,22 +131,32 @@ HammingDistance* spdz_hd(Party* party, Iris* iris1, Iris* iris2) {
         int MAC_m1m2 = m1m2_struct[1];
 
         int num1 = f1+f2-2*f1f2;
-        int temp = -(m1+m2-m1m2);
+        int num2;
+        // only SERVER holds the constant 1
+        if (party->ID == ID_SERVER) num2 = 1-(m1+m2-m1m2);
+        else num2 = -(m1+m2-m1m2);
         int MAC_num1 = MAC_f1+MAC_f2-2*MAC_f1f2;
-        int MAC_temp = -(MAC_m1+MAC_m2-MAC_m1m2);
+        int MAC_temp = 1*party->MACkey-(MAC_m1+MAC_m2-MAC_m1m2);
 
-        int* num2_struct = spdz_mult(party, num1, temp, MAC_num1, MAC_temp, MULT_SAVEOPEN);
-        int num2 = num2_struct[0];
+        if (VERBOSE) printf("[SPDZ_HD] NUM1: %d, NUM2: %d\n", num1, num2);
+        if (VERBOSE) printf("[SPDZ_HD] Calculating NUM of feature %d.\n", i);
 
-        num += num1+num2;
+        int* num_struct = spdz_mult(party, num1, num2, MAC_num1, MAC_temp, MULT_SAVEOPEN);
+        int num_sum = num_struct[0];
+
+        if (VERBOSE) printf("[SPDZ_HD] NUM: %d\n", num);
+
+        num += num_sum;
         den -= (m1+m2-m1m2);
-        free(num2_struct);
+        free(num_struct);
         free(f1f2_struct);
         free(m1m2_struct);
+
+        debug_print++;
     }
 
     HammingDistance* res = hd_create(num, den);
-    printf("[SPDZ_HD_%d] num: %d; den: %d\n", party->ID, num, den);
+    printf("[SPDZ_HD_RES_%d] num: %d; den: %d\n", party->ID, num, den);
     return res;
 }
 

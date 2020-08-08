@@ -73,12 +73,12 @@ void iris_print(Iris* iris) {
 	if (VERBOSE==2) maxprint=iris->size;
 	printf("Printing iris %p\n", iris);
 	for (i=0; i<maxprint; i++) {
-		printf("Iriscode[%d]=%d\n", i, iris->iriscode[i]);
-		printf("MAC_Iriscode[%d]=%d\n", i, iris->MAC_iriscode[i]);
+		printf("Iriscode[%d] = %d\n", i, iris->iriscode[i]);
+		printf("MAC_Iriscode[%d] = %d\n", i, iris->MAC_iriscode[i]);
 	}	
 	for (i=0; i<maxprint; i++) {
-		printf("Irismask[%d]=%d\n", i, iris->mask[i]);
-		printf("MAC_Irismask[%d]=%d\n", i, iris->MAC_mask[i]);
+		printf("Irismask[%d] = %d\n", i, iris->mask[i]);
+		printf("MAC_Irismask[%d] = %d\n", i, iris->MAC_mask[i]);
 	}
 	printf("\n");
 }
