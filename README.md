@@ -2,14 +2,16 @@
 
 An implementation of SPDZ with a Trusted Dealer.
 
-Developed for the Bachelor's Degree of "Sapienza Università di Roma" in "Ingegneria Informatica e Automatica", AA 2019/2020.
+Developed for the Bachelor's Degree of "Sapienza Università di Roma" in "Ingegneria Informatica e Automatica", AY 2019/2020.
 
-Two phase protocol:
+Two-phase protocol:
 - Offline Phase, where the Trusted Dealer (TD) generates the preprocessing material;
 - Online Phase, where all the three entities are active.
 
 TD will generate the preprocessing material which will be sent to the Client and to the Server once they start the protocol.
+
 Then Client and Server will compute the Hamming distance between two irises using SPDZ (TD is not involved).
+
 Finally, the computation is checked via commit-and-open with the TD.
 
 In this version, there will be three executables.
