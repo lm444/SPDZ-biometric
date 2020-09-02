@@ -19,6 +19,7 @@ flags = -g -Wall
 all: client server dealer
 
 client: $(srcClient)
+	mkdir -p $(binPath)
 	gcc $(flags) -o $(binPath)$(binClient) $(srcClient) 
 
 server: $(srcServer)
@@ -32,3 +33,4 @@ clean:
 	rm -rf $(binPath)$(binClient)
 	rm -rf $(binPath)$(binServer)
 	rm -rf $(binPath)$(binDealer)
+	rmdir $(binPath)
