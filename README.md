@@ -19,6 +19,6 @@ It is mandatory to run them in the following order:
 - dealer -> server -> client
 
 In the following links will be additional resources:
-- [Thesis, with code documentation](https://docs.google.com/document/d/1Ot9xtwCZHZKuxxdobcQ-d9KGzeHg5NgLcbT9VEKzXCw) (in italian)
+- [Thesis, with code documentation](https://drive.google.com/file/d/1QJl0NSruty6UyxOy7l52z4nrqQYevE9O/view) (in italian)
 - [Valgrind Logs](https://drive.google.com/open?id=1wc-314hY08XFIxt-Wy1_6Git62UBIA2P)
 - [Output Logs](https://drive.google.com/open?id=1160kQMSFxATaASdUsCVzuDTpn1SKiijS)
